@@ -1,5 +1,31 @@
+using System.Reflection.Metadata;
+
 public class Program
 {
+    public static int DemandeInt()
+    {
+        bool condition = false;
+        int Valeur;
+        do
+        {
+            string saisie = Console.ReadLine();
+            condition = int.TryParse(saisie, out Valeur);
+            if (!condition || int.Parse(saisie) < 1)
+            {
+                Console.WriteLine("Erreur : veuillez entrer un entier valide !");
+                condition = false;
+            }
+            else
+            {
+                Valeur = int.Parse(saisie);
+            }
+        } while (!condition);
+        return Valeur;
+    }
+    public static void ClearConsole ()
+    {
+        Console.Clear();
+    }
     public class Param
     {
         public int NBLutins { get; set; }
@@ -7,35 +33,22 @@ public class Program
         public int NBJouetsParTraineau { get; set; }
         public int NBEnfants { get; set; }
         public int NBLettresParHeures { get; set; }
-        public Param(int nblutins, int nbnains, int nbJouetsParTraineau, int nbEnfants, int nbLettresParHeures)
+        public Param()
         {
-            this.NBLutins = nblutins;
-            this.NBNains = nbnains;
-            this.NBJouetsParTraineau = nbJouetsParTraineau;
-            this.NBEnfants = nbEnfants;
-            this.NBLettresParHeures = nbLettresParHeures;
-
+            Console.WriteLine("Veuillez donner Le nombres de lutins max :");
+            NBLutins = DemandeInt();
+            Console.WriteLine("Veuillez donner Le nombres de nains max :");
+            NBNains = DemandeInt();
+            Console.WriteLine("Veuillez donner Le nombres de jouets max par traineau :");
+            NBJouetsParTraineau = DemandeInt();
+            Console.WriteLine("Veuillez donner Le nombres d'enfants max :");
+            NBEnfants = DemandeInt();
+            Console.WriteLine("Veuillez donner Le nombres de lettres par heures :");
+            NBLettresParHeures = DemandeInt();
         }
     }
-    public static void InitParam()
-    {
-        Console.WriteLine("Veuillez donner Le nombres de lutins max :");
-        int nblutins = int.Parse(Console.ReadLine());
-        Console.WriteLine("Veuillez donner Le nombres de nains max :");
-        int nbnains = int.Parse(Console.ReadLine());
-        Console.WriteLine("Veuillez donner Le nombres de jouets max par traineau :");
-        int nbJouetsParTraineau = int.Parse(Console.ReadLine());
-        Console.WriteLine("Veuillez donner Le nombres d'enfants max :");
-        int nbEnfants = int.Parse(Console.ReadLine());
-        Console.WriteLine("Veuillez donner Le nombres de lettres par heures :");
-        int nbLettresParHeures = int.Parse(Console.ReadLine());
-        Param Noel = new Param(nblutins, nbnains, nbJouetsParTraineau, nbEnfants, nbLettresParHeures);
-    }
-
-
-
     public static void Main()
     {
-        InitParam();
+        Param Noel = new Param();
     }
 }
