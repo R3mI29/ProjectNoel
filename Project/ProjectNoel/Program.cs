@@ -2,6 +2,10 @@ using System.Reflection.Metadata;
 
 public class Program
 {
+    public static void ClearConsole ()
+    {
+        Console.Clear();
+    }
     public static int DemandeInt()
     {
         bool condition = false;
@@ -20,11 +24,8 @@ public class Program
                 Valeur = int.Parse(saisie);
             }
         } while (!condition);
+        ClearConsole();
         return Valeur;
-    }
-    public static void ClearConsole ()
-    {
-        Console.Clear();
     }
     public class Param
     {
@@ -49,6 +50,7 @@ public class Program
     }
     public static void Main()
     {
+        ClearConsole();
         Param Noel = new Param();
     }
 }
