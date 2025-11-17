@@ -1,10 +1,9 @@
-using System.Formats.Asn1;
 using System.Reflection.Metadata;
 using ProjectNoel;
 
 namespace ProjectNoel
 {
-        public class Program
+    public class Program
     {
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
@@ -41,17 +40,15 @@ namespace ProjectNoel
         // de son fonctionement.
         public class Param
         {
-            public int NBLutins { get; set; } // Le nombre de Lutins Maximum que le Père Noël autorise
-            public int NBNains { get; set; } //Le nombre de Nains Maximum que le Père Noël autorise
-            public int NBJouetsParTraineau { get; set; } //Le nombre de jouets par traineau Maximum que le Père Noël autorise
-            public int NBEnfants { get; set; } //Le nombre maximum d'enfants qui envoient une lettres au Père Noël
-            public int NBLettresParHeures { get; set; } //Le nombres de lettres que le Père Noël reçois par heures
-
-            //Le Constructeur//
+            public int NBLutins { get; set; } // Nombre maximum de Lutins que l'utilisateur autorise
+            public int NBNains { get; set; } // Nombre maximum de Nains que l'utilisateur autorise
+            public int NBJouetsParTraineau { get; set; } // Nombre maximum de jouets par traineau autorisés par l'utilisateur
+            public int NBEnfants { get; set; } // Nombre d'enfants qui demandent des cadeaux au Père Noël
+            public int NBLettresParHeures { get; set; } // Nombre de lettres que le Père Noël reçois par heures
             public Param()
             {
                 Console.WriteLine("Veuillez donner Le nombres de lutins max :");
-                NBLutins = DemandeInt();// Appelle de la fonction DemandeInt() qui demande à l'utilisateur de rentrer les valeurs de chaque variables.
+                NBLutins = DemandeInt(); // Demande la valeurs de la variables à l'utilisateur en appellant la fonction DemandeInt() 
                 Console.WriteLine("Veuillez donner Le nombres de nains max :");
                 NBNains = DemandeInt();
                 Console.WriteLine("Veuillez donner Le nombres de jouets max par traineau :");
@@ -225,7 +222,31 @@ namespace ProjectNoel
                 this.Liste.Clear();//Vide la liste qui sert à représenter la pile
             }
         }
-        
+        //---------------------------------------------Classe Lettre---------------------------------------------//        
+        //Auteur : Tancrède
+        //Description : classe qui représente une lettre avec trois attributs, le nom et le prénom de l'enfant et le jouet demandé par l'enfant
+        public class Lettre
+        {
+            public string Nom {get; set;}
+            public string Prenom {get; set;}
+            public Jouet Jouet {get; set;}
+
+            //Constructeur
+            public Lettre( Jouet jouet, string nom, string prenom)
+            {
+                Nom = nom;
+                Prenom = prenom;
+
+                //On utilisera la fonction AgeToJouet pour ce paramètre
+                Jouet = jouet;
+            }
+
+            public void Affiche()
+            {
+                Console.WriteLine($"{Prenom} {Nom} a demandé un {Jouet} au Père Noël");
+            }
+
+        }
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
@@ -241,7 +262,7 @@ namespace ProjectNoel
         // pour rendre l'interaction de l'utilisateur avec cette dernière plus facile et agréable.
         public static void ClearConsole ()
         {
-            Console.Clear();// Clear la console pour la rendre plus lisible et agréable pour l'utilisateur
+            Console.Clear();
         }
 
         //Auteur : Rémi
@@ -258,34 +279,47 @@ namespace ProjectNoel
             {
                 string saisie = Console.ReadLine();
                 condition = int.TryParse(saisie, out Valeur);
-                if (!condition || int.Parse(saisie) < 1) // Si la condition est toujours égale à False, ou que la valeur de l'utilisateur et négative. La fonction renvoie une erreur et demande à l'utilisateur une nouvelle valeur.
+                if (!condition || int.Parse(saisie) < 1)
                 {
                     Console.WriteLine("Erreur : veuillez entrer un entier valide !");
-                    condition = false;// Remet la condition à False, car la valeur est un chiffre mais il est négatif.
+                    condition = false;
                 }
                 else
                 {
-                    Valeur = int.Parse(saisie);// Coonversion de la valeur en Int, si la valeur est un chiffre positif.
+                    Valeur = int.Parse(saisie);
                 }
-            } while (!condition);// Tant que la condition vaut False, la boucle continue de tourner.
+            } while (!condition);
             ClearConsole();
-            return Valeur;// Retourne la valeur int que l'utilisateur a entrer.
+            return Valeur;
         }
 
         //Auteur : Rémi
-        //Fonction/Class : JouetsParEnfants
+        //Fonction/Class : AgetoJouet
         //Paramètres : age (int)
         //Renvoie : Jouet
         //Utilité : La fonction renvoie le type de jouet adapté en fonction de l'âge de l'enfant.
-        public static Jouet JouetParEnfants(int age)
+        //0 et 18 ans
+        public static Jouet AgeToJouet(int age)
         {
+            // Test si l'âge entrer par l'utisateur est dans compris entre 0 et 18 ans les deux compris, sinon renvoie un erreur.
             if (age < 0 || age > 18){throw new Exception("L'âge doit être compris entre 0 et 18 ans.");}
-            else if(age < 3){Console.Write("Nounours");return Jouet.Nounours;}
-            else if(age < 6){Console.Write("Tricycle");return Jouet.Tricycle;}
-            else if(age < 11){Console.Write("Jumelles");return Jouet.Jumelles;}
-            else if(age < 16){Console.Write("Abonnement");return Jouet.Abonnement;}
-            else{Console.Write("Ordi");return Jouet.Ordinateur;}
+            else if(age < 3){return Jouet.Nounours;}
+            else if(age < 6){return Jouet.Tricycle;}
+            else if(age < 11){return Jouet.Jumelles;}
+            else if(age < 16){return Jouet.Abonnement;}
+            else{return Jouet.Ordinateur;}
         }
+
+        //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
+        //Auteur : Tancrède
+        //Description : Fonction qui génére une lettre aléatoire et l'ajoute dans la pile de lettre sur le bureau du Père Noël
+        //Prendre la pile en paramètre ?????
+        //Les prénoms sont-ils nécessaires ???????????
+        public static void CreerLettre()
+        {
+            
+        }
+
 
         public static void Main()
         {
@@ -295,7 +329,11 @@ namespace ProjectNoel
             //----------------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
             
+            //Paramètres entrés par l'utilisateur
             //Param Noel = new Param();
+
+            //Pile des lettres sur le bureau du Père Noël
+            Pile<Lettre> pileLettres = new Pile<Lettre>{};
 
             //----------------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
@@ -354,16 +392,16 @@ namespace ProjectNoel
             pileTest.Affiche();
             //pileTest.Depile(); --> renvoie une erreur
 
+            //****Classe Lettres****
+            Console.WriteLine("-------------Tests classe Lettres");
 
+            //Création 
+            Lettre lettreTest = new Lettre(Jouet.Tricycle, "Robert", "LEROI"); 
 
-
-
-
-
+            //Affichage
+            lettreTest.Affiche();
 
             
-            ClearConsole();
-            JouetParEnfants(18);
         }
     }
 
