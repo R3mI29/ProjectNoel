@@ -311,13 +311,19 @@ namespace ProjectNoel
         }
 
         //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
-        //Auteur : Tancrède
+        //Auteur : Tancrède, Rémi
         //Description : Fonction qui génére une lettre aléatoire et l'ajoute dans la pile de lettre sur le bureau du Père Noël
-        //Prendre la pile en paramètre ?????
-        //Les prénoms sont-ils nécessaires ???????????
-        public static void CreerLettre()
+        //Prendre la pile de lettre en paramètre 
+        //Renvoie void, mais créer une nouvelle lettre aléatoire
+        public static void CreerLettre(Pile<Lettre> PileDeLettre)
         {
-            
+            Random random = new Random(); // Initialise random
+            string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou"}; // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
+            string[] ListeNoms = {"Dupont", "Martin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Durand", "Dubois"}; // Initialise une liste des noms (noms aléatoire)
+            string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
+            string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
+            Jouet jouet = AgeToJouet(random.Next(18)); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet 
+            Lettre lettreAléatoire = new Lettre(jouet,nom, prenom); // Créer la lettre avec les valeurs aléatoires plus hauts
         }
 
 
@@ -400,6 +406,7 @@ namespace ProjectNoel
 
             //Affichage
             lettreTest.Affiche();
+
 
             
         }
