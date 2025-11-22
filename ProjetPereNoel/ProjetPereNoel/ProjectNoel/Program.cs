@@ -82,7 +82,7 @@ namespace ProjectNoel
             //Description : Enfile la valeur en paramètre.
             public void Enfile (T pValeur)
             {
-                this.Liste.AddFirst(pValeur);//La première position est la position d'arrivée dans la file
+                this.Liste.AddLast(pValeur);//La dernière position est la position d'arrivée dans la file
             }
 
             //----Méthode Defile----//
@@ -93,7 +93,7 @@ namespace ProjectNoel
                 if (this.EstVide() == false)
                 {
                     T returnValue = this.Liste.Head.Valeur;
-                    this.Liste.RemoveLast();//La dernière position est la première position dans la file
+                    this.Liste.RemoveFirst();//La première position de la liste est la sortie
                     return returnValue;
                 }
                 else
@@ -116,19 +116,24 @@ namespace ProjectNoel
             //Description : fonction qui affiche le contenu de la file et son sens de défilage
             public void Affiche()
             {
-                if (this.EstVide() == true)//Si la file est vide on ne l'affiche pas 
-                {
-                    Console.WriteLine("La file est vide");
-                }
+                if (this.EstVide()) {Console.WriteLine("La file est vide");}
                 else
                 {
-                    Node<T> tete = this.Liste.Head;//On prend la première valeur de la file
-                    while(tete != null)
+                        
+                    File<T> fileTemp = new File<T> {};
+                    Console.Write("<--");
+                    while (this.EstVide() != true)
                     {
-                        Console.Write($" | {tete.Valeur}");
-                        tete = tete.Next;//On passe à la prochaine valeur de la file
+                        T valTemp = this.Defile();
+                        fileTemp.Enfile(valTemp);
+                        Console.Write($" {valTemp} |");
                     }
-                    Console.WriteLine(" --> ");
+                    while (fileTemp.EstVide() != true)
+                    {
+                        T valTemp = fileTemp.Defile();
+                        this.Enfile(valTemp);
+                    }
+                    Console.WriteLine(" File");
                 }
             }
 
@@ -197,20 +202,23 @@ namespace ProjectNoel
             //Description : affiche le contenu de la pile et le sens dans laquelle elle va.
             public void Affiche()
             {
-                if (this.EstVide() == true)
-                {
-                    Console.WriteLine("La pile est vide");
-                }
+                if (this.EstVide()){Console.WriteLine("La pile est vide");}
                 else
                 {
-                    Node<T> tete = this.Liste.Head;//On prend la première valeur de la pile
-                    Console.Write("<-- ");//sens de sortie
-                    while(tete != null)
+                    Pile<T> pileTemp = new Pile<T> {};
+                    Console.Write("<--");
+                    while (this.EstVide() != true)
                     {
-                        Console.Write($"{tete.Valeur} | ");
-                        tete = tete.Next;//On passe à la prochaine valeur de la pile
+                        T valTemp = this.Depile();
+                        Console.Write($" {valTemp} |");
+                        pileTemp.Empile(valTemp);
                     }
-                    Console.WriteLine();
+                    while (pileTemp.EstVide() != true)
+                    {
+                        T valTemp = pileTemp.Depile();
+                        this.Empile(valTemp);
+                    }
+                    Console.WriteLine(" Pile");
                 }
             }
 
@@ -312,18 +320,20 @@ namespace ProjectNoel
 
         //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
         //Auteur : Tancrède, Rémi
-        //Description : Fonction qui génére une lettre aléatoire et l'ajoute dans la pile de lettre sur le bureau du Père Noël
-        //Prendre la pile de lettre en paramètre 
-        //Renvoie void, mais créer une nouvelle lettre aléatoire
+        //Description : Fonction qui génére une lettre aléatoire et l'ajoute dans la pile de lettre sur le bureau du Père Noël prise en paramètre
         public static void CreerLettre(Pile<Lettre> PileDeLettre)
         {
             Random random = new Random(); // Initialise random
-            string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou"}; // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
-            string[] ListeNoms = {"Dupont", "Martin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Durand", "Dubois"}; // Initialise une liste des noms (noms aléatoire)
+            // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
+            string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
+            // Initialise une liste des noms (noms aléatoire)
+            string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Durand", "Dubois"}; 
             string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
             string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
             Jouet jouet = AgeToJouet(random.Next(18)); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet 
             Lettre lettreAléatoire = new Lettre(jouet,nom, prenom); // Créer la lettre avec les valeurs aléatoires plus hauts
+            //Ajoute la lettre à la pile 
+            PileDeLettre.Empile(lettreAléatoire);
         }
 
 
@@ -406,6 +416,10 @@ namespace ProjectNoel
 
             //Affichage
             lettreTest.Affiche();
+
+            //Création et affichage d'une lettre dans la pile des lettres du père Noël
+            CreerLettre(pileLettres);
+            pileLettres.Affiche();
 
 
             
