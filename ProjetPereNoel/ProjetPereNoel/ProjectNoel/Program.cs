@@ -300,7 +300,8 @@ namespace ProjectNoel
             ClearConsole();
             return Valeur;
         }
-
+        
+        //---------------------------------------------Fonction AgeToJouet---------------------------------------------// 
         //Auteur : Rémi
         //Fonction/Class : AgetoJouet
         //Paramètres : age (int)
@@ -427,3 +428,4 @@ namespace ProjectNoel
     }
 
 }
+
