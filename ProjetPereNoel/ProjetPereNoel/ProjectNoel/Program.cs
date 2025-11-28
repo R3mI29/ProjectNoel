@@ -33,8 +33,7 @@ namespace ProjectNoel
         public enum Continents
         {
             Afrique,
-            AmeriqueDuNord,
-            AmeriqueDuSud,
+            Amerique,
             Asie,
             Europe,
             Oceanie
@@ -541,12 +540,11 @@ namespace ProjectNoel
         //Utilité : La fonction renvoie un continent en fonction du numero au hazard qui est en paramètre.
         public static Continents RandomContinent(int nbr)
         {
-            if(nbr < 0 || nbr > 5){throw new Exception("Le numéro n'est pas convenable");}
+            if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
             else if(nbr == 0){return Continents.Afrique;}
-            else if(nbr == 1){return Continents.AmeriqueDuNord;}
-            else if(nbr == 2){return Continents.AmeriqueDuSud;}
-            else if(nbr == 3){return Continents.Asie;}
-            else if(nbr == 4){return Continents.Europe;}
+            else if(nbr == 1){return Continents.Amerique;}
+            else if(nbr == 2){return Continents.Asie}
+            else if(nbr == 3){return Continents.Europe;}
             else{return Continents.Oceanie;}
         }
 
@@ -564,7 +562,7 @@ namespace ProjectNoel
             string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
             string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
             string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
-            Continents continent = RandomContinent(random.Next(5));// Prend un nombre aléatoire et en fait un Continent
+            Continents continent = RandomContinent(random.Next(4));// Prend un nombre aléatoire et en fait un Continent
             Jouet jouet = AgeToJouet(random.Next(18)); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
             string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
             Lettre lettreAléatoire = new Lettre(jouet,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
