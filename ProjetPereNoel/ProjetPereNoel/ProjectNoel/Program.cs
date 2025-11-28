@@ -543,7 +543,7 @@ namespace ProjectNoel
             if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
             else if(nbr == 0){return Continents.Afrique;}
             else if(nbr == 1){return Continents.Amerique;}
-            else if(nbr == 2){return Continents.Asie}
+            else if(nbr == 2){return Continents.Asie;}
             else if(nbr == 3){return Continents.Europe;}
             else{return Continents.Oceanie;}
         }
