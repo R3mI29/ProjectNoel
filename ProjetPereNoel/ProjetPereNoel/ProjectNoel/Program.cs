@@ -632,8 +632,13 @@ namespace ProjectNoel
             pileLettres.Affiche();
 
 
+
+            //--------Rémi--------//
+
             Console.Clear();
 
+            //****Classe Nain****
+            Console.WriteLine("-------------Tests classe Nain");
 
             //Création d'un nain test
             Nain nain1 = new Nain();
@@ -642,8 +647,33 @@ namespace ProjectNoel
             nain1.InitEmballage(lettreTest);
             nain1.Emballage();
             nain1.LettreActuelle.Affiche();
+
+            //****Classe Elfe et Traineau****
+            Console.WriteLine("-------------Tests classe Elfe et Traineau");
+
+
+            //Création d'un elfe et donc d'un traîneau
+            Elfe elfe1 = new Elfe(Continents.Afrique, 230);
+
+            //Ajoute une lettre emballée au traineau
+            elfe1.AjouteTraineau(nain1.Emballage());
+            elfe1.TraineauCont.PileCadeaux.Affiche();
+
+            //Test si le traîneau est plein
+            Console.WriteLine($"Le traîneau est'il plein ?  {elfe1.TraineauCont.Plein()}");
+
+            //Teste si le traîneau part avec la fonction Depart
+            elfe1.TraineauCont.Depart();
+            Console.WriteLine($"Test si le traîneau est parti après la fonction Depart ?  {elfe1.TraineauCont.Parti}");
+
+            // Teste de la fonction EnVoyage
+            elfe1.TraineauCont.EnVoyage();
+            elfe1.TraineauCont.TempsAvantRetour = 0;
+            elfe1.TraineauCont.EnVoyage();
+            Console.WriteLine($"Le traîneau est-il encore en voyage ? {elfe1.TraineauCont.Parti}");
+            Console.WriteLine("Regardons la pile des lettres suite au retour du traîneau :");
+            elfe1.TraineauCont.PileCadeaux.Affiche();
         }
     }
 
 }
-
