@@ -42,7 +42,7 @@ namespace ProjectNoel
 
         //Auteur : Rémi
         //Type : EtatTravail
-        //Ce type renseigne les status qu'un travailleur peut avoir dans cet algo.
+        //Ce type renseigne les status qu'un travailleur peut avoir.
         public enum EtatTravail
         {
             Travail,
@@ -324,7 +324,7 @@ namespace ProjectNoel
             //Utilité : La fonction sert à ajouter les cadeaux au traineaux.
             public void ChargeTraineau(Lettre lettre)
             {
-                PileCadeaux.Empile(lettre);
+                PileCadeaux.Empile(lettre);                 // Ajoute la lettre à la pile du traîneau
             }
 
             //Auteur : Rémi
@@ -333,7 +333,7 @@ namespace ProjectNoel
             //Utilité : La fonction renvoie un bool qui nous dis si le traineau est plein
             public bool Plein()
             {
-                return PileCadeaux.Taille() >= CapaciteMax;
+                return PileCadeaux.Taille() >= CapaciteMax;    // teste si le traîneau est plein.
             }
 
             //Auteur : Rémi
@@ -342,10 +342,10 @@ namespace ProjectNoel
             //Utilité : La fonction sert à savoir si le traineau à fini la tourné, si oui alors la pile des cadeaux est vidée et parti = false, sinon alors on enlève 1 heure du temps avant son retour et ont dis qu'il est encore en livraison.
             public void EnVoyage()
             {
-                if (Parti == true && TempsAvantRetour <= 0)
+                if (Parti == true && TempsAvantRetour <= 0)     // test si le voyage est fini.
                 {
-                    Parti = false;
-                    PileCadeaux.Vide();
+                    Parti = false;                          
+                    PileCadeaux.Vide();                         // Le voyage est fini donc on vide la pile.
                 }
                 else if (Parti == true)
                 {
@@ -368,27 +368,21 @@ namespace ProjectNoel
             }
         }   
 
-
         //---------------------------------------------Classe Nain---------------------------------------------//
         // Auteur : Rémi
         // Utilité : La classe Nain sert à créer les nains, il sont ceux qui emballe les caadeau pour les donnés aux elfes.
         public class Nain
         {
-            public int ID {get; set;}
-            public string Nom {get; set;}
             public EtatTravail Statut {get; set;}
             public int TempRestant {get; set;}
             public Lettre? LettreActuelle {get; set;}
             
             //Constructeur
-            public Nain(int id, string nom)
+            public Nain()
             {
-                this.ID = id;
-                this.Nom = nom;
                 this.LettreActuelle = null;
                 this.TempRestant = 0;
                 this.Statut = EtatTravail.Attente;
-
             }
 
             //Auteur : Rémi
@@ -396,7 +390,7 @@ namespace ProjectNoel
             //Paramètres : lettre (Lettre)
             //Renvoie : Void
             //Utilité : La fonction initialise les valeurs du nain pour qu'il puisse commencer à emballer.
-            public void DebutEmballage(Lettre lettre)
+            public void InitEmballage(Lettre lettre)
             {
                 if(Statut == EtatTravail.Attente && lettre != null)
                 {
@@ -424,7 +418,6 @@ namespace ProjectNoel
                         Lettre lettreFini = LettreActuelle;
                         LettreActuelle = null;
                         Statut = EtatTravail.Attente;
-
                         return lettreFini;
                     }
                 }
@@ -443,14 +436,12 @@ namespace ProjectNoel
         public class Elfe
         {
             public Continents Continent {get; set;}
-            public int ID {get; set;}
             public Traineau TraineauCont {get; set;}
 
             //Constructeur
-            public Elfe(Continents continent, int id, int capaciteMax)
+            public Elfe(Continents continent, int capaciteMax)
             {
                 Continent = continent;
-                ID = id;
                 TraineauCont = new Traineau(capaciteMax, continent);
             }
 
@@ -465,26 +456,11 @@ namespace ProjectNoel
             }
         }
 
-
-
-
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
-
-
-        //Auteur : Rémi
-        //Fonction/Class : ClearConsole
-        //Paramètres : Aucun
-        //Renvoie : Void
-        //Utilité : La fonction sert à nettoyer la console, 
-        // pour rendre l'interaction de l'utilisateur avec cette dernière plus facile et agréable.
-        public static void ClearConsole ()
-        {
-            Console.Clear();
-        }
 
         //Auteur : Rémi
         //Fonction/Class : DemandeInt
@@ -510,7 +486,7 @@ namespace ProjectNoel
                     Valeur = int.Parse(saisie);
                 }
             } while (!condition);
-            ClearConsole();
+            Console.Clear();
             return Valeur;
         }
         
@@ -590,7 +566,7 @@ namespace ProjectNoel
             //----------------------------------------------------Test unitaires----------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
-            ClearConsole();
+            Console.Clear();
             //----------------------------Jalon 1----------------------------//
 
             //------------Tancrède------------//
@@ -656,7 +632,16 @@ namespace ProjectNoel
             pileLettres.Affiche();
 
 
-            
+            Console.Clear();
+
+
+            //Création d'un nain test
+            Nain nain1 = new Nain();
+
+            //Teste
+            nain1.InitEmballage(lettreTest);
+            nain1.Emballage();
+            nain1.LettreActuelle.Affiche();
         }
     }
 
