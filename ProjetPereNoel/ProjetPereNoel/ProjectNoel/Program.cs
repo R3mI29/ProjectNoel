@@ -349,8 +349,8 @@ namespace ProjectNoel
                 }
                 else if (Parti == true)
                 {
+                    Console.WriteLine($"Encore en Livraison, il reste encore {TempsAvantRetour}h");
                     TempsAvantRetour--;
-                    Console.WriteLine("Encore en Livraison");
                 }
             }
 
@@ -646,3 +646,4 @@ namespace ProjectNoel
     }
 
 }
+
