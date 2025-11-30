@@ -40,13 +40,25 @@ namespace ProjectNoel
         }
 
 
-        //Auteur : Rémi
+        //Auteur : Rémi, Tancrède
         //Type : EtatTravail
-        //Ce type renseigne les status qu'un travailleur peut avoir.
+        //Description : Type énuméré représentant les différents statuts qu'un travailleur peut avoir
         public enum EtatTravail
         {
+            //Pour les Lutins et Nains s'ils sont au travail
             Travail,
-            Attente
+
+            //Pour les Nains et Lutins qui n'ont pas de travail
+            Attente,
+
+            //Pour les Nains et Lutins qui sont au repos
+            Repos,
+
+            //Pour les Elfes en voyage
+            EnVoyage,
+
+            //Pour les Elfes en train de charger les cadeaux
+            ChargementCadeaux
         }
 
         //----------------------------------------------------------------------------------------------------------------------//
@@ -88,11 +100,13 @@ namespace ProjectNoel
         public class File<T>
         {
             internal ListeChainee<T> Liste {get; set;}// Liste qui représente la file
+            public int Taille;
 
             //Constructeur
             internal File()
             {
                 Liste = new ListeChainee<T> {} ;
+                Taille = 0;
             }
 
             //-----------------Méthode internales à la classe-----------------//
@@ -104,6 +118,7 @@ namespace ProjectNoel
             public void Enfile (T pValeur)
             {
                 this.Liste.AddLast(pValeur);//La dernière position est la position d'arrivée dans la file
+                Taille++;
             }
 
             //----Méthode Defile----//
@@ -115,6 +130,7 @@ namespace ProjectNoel
                 {
                     T returnValue = this.Liste.Head.Valeur;
                     this.Liste.RemoveFirst();//La première position de la liste est la sortie
+                    Taille--;
                     return returnValue;
                 }
                 else
@@ -164,6 +180,7 @@ namespace ProjectNoel
             public void Vide()
             {
                 this.Liste.Clear();//Vide la liste qui sert à représenter la file
+                this.Taille = 0;
             }
         }
 
@@ -177,11 +194,13 @@ namespace ProjectNoel
         public class Pile<T>
         {
             public ListeChainee<T> Liste {get; set;}//Liste représentant la pile
+            public int Taille;//Attribut représentant la taille de la pile
 
             //Constructeur
             public Pile()
             {
                 Liste = new ListeChainee<T> {} ;
+                Taille = 0;
             }
 
             //----Méthode Empile----//
@@ -192,6 +211,7 @@ namespace ProjectNoel
             public void Empile (T pValeur)
             {
                 this.Liste.AddFirst(pValeur);//La première position est la position d'arrivée dans la pile
+                this.Taille ++;
             }
 
             //----Méthode Depile----//
@@ -202,6 +222,7 @@ namespace ProjectNoel
                 if (this.EstVide() == false){
                     T returnValue = this.Liste.Head.Valeur;
                     this.Liste.RemoveFirst();//On enlève la première valeur de la liste quand on dépile
+                    this.Taille--;
                     return returnValue;
                 }
                 else
@@ -249,25 +270,10 @@ namespace ProjectNoel
             public void Vide()
             {
                 this.Liste.Clear();//Vide la liste qui sert à représenter la pile
+                this.Taille = 0;
             }
-
-            //----Méthode Taille----//
-            //Auteur : Rémi 
-            //Description : Renvoie un int, qui est la taille de la pile
-            public int Taille()
-            {
-                int count = 0;
-                Node<T> node = this.Liste.Head;
-
-                while (node != null)
-                {
-                    count++;
-                    node = node.Next;
-                }
-                return count;
-            }
-
         }
+
 
 
         //---------------------------------------------Classe Lettre---------------------------------------------//        
@@ -278,27 +284,94 @@ namespace ProjectNoel
             public string Nom {get; set;}
             public string Prenom {get; set;}
             public Continents Continent {get; set;}
-            public Jouet Jouet {get; set;}
             public string Adresse {get; set;}
+            public int Age {get;set;}
 
             //Constructeur
-            public Lettre( Jouet jouet, string nom, string prenom, Continents continent, string adresse)
+            public Lettre( int age, string nom, string prenom, Continents continent, string adresse)
             {
                 Nom = nom;                  //On utilisera la fonction CreeLettre pour ce paramètre
                 Prenom = prenom;            //On utilisera la fonction CreeLettre pour ce paramètre
-                Jouet = jouet;              //On utilisera la fonction AgeToJouet pour ce paramètre
                 Continent = continent;      //On utilisera la fonction CreeLettre pour ce paramètre
                 Adresse = adresse;          //On utilisera la fonction CreeLettre pour ce paramètre
+                Age = age;                  //Age généré aléatoirement
             }
 
             public void Affiche()
             {
-                Console.WriteLine($"{Prenom} {Nom} du {Adresse} venant de d'{Continent} a demandé un {Jouet} au Père Noël");
+                Console.WriteLine($"{Prenom} {Nom} du {Adresse} en {Continent} a {Age} ans");
             }
 
         }
 
-         //---------------------------------------------Classe Traineau---------------------------------------------//
+        //---------------------------------------------Classe Lutin---------------------------------------------//
+        //Auteur : Tancrède
+        //Description : classe représentant les lutins, leurs attributs et leurs méthodes qui leurs sont utiles pour la fabrications des cadeaux
+        public class Lutin
+        {
+            
+            //Statut de travail du Lutin
+            public EtatTravail Statut;
+
+            //Compteur qui représente le temps restant au lutin pour fabriquer son cadeau
+            public int HeureRestantes; 
+
+            //Lettre en cours de traitement
+            public Lettre? LettreEnCours;
+            
+            public Lutin()
+            {
+                Statut = EtatTravail.Attente;//Le lutin est par defaut en attente
+                HeureRestantes = 0;
+                LettreEnCours = null;
+            }
+
+            public void DebutFabricationJouet(Lettre pLettre)
+            {
+                this.LettreEnCours = pLettre;
+
+                //On récupère le jouet correspondant à l'âge de l'enfant grâce à la fonction
+                //AgeToJouet() et on récupère son temps de fabrication
+                this.HeureRestantes = (int)AgeToJouet(pLettre.Age);
+
+                //On change l'état du Lutin
+                this.Statut = EtatTravail.Travail;
+            }
+
+            //----Méthode Travaille----//
+            //Auteur : Tancrède
+            //Description : renvoie la Lettre du Lutin s'il a fini de fabriquer le jouet 
+            //sinon fait descendre le temps restant s'il est au travail et ne renvoie rien sinon
+            public Lettre Travaille()
+            {
+                //Ne renvoie rien s'il n'est ni au travail ou au repos
+                if (this.Statut != EtatTravail.Repos && this.Statut != EtatTravail.Travail)
+                {
+                    return null;
+                }
+
+                //On fait descendre le temps 
+                this.HeureRestantes --;
+
+                //Si la lettre est terminé
+                if(this.HeureRestantes <= 0)
+                {
+                    //Pour pouvoir mettre l'attribut LettreEnCours comme nul
+                    Lettre LettreTerminee = this.LettreEnCours;
+
+                    this.Statut = EtatTravail.Attente;
+                    this.LettreEnCours = null;
+
+                    return LettreTerminee;// On renvoie la lettre finie
+                }
+
+                //Pour éviter les erreurs
+                return null;
+            }
+
+        }
+        
+        //---------------------------------------------Classe Traineau---------------------------------------------//
         // Auteur : Rémi
         // Utilité : La classe Traineau sert à Initialiser les traineaux qui serviront pour la livraison des cadeaux
         public class Traineau
@@ -333,7 +406,7 @@ namespace ProjectNoel
             //Utilité : La fonction renvoie un bool qui nous dis si le traineau est plein
             public bool Plein()
             {
-                return PileCadeaux.Taille() >= CapaciteMax;    // teste si le traîneau est plein.
+                return PileCadeaux.Taille >= CapaciteMax;    // teste si le traîneau est plein.
             }
 
             //Auteur : Rémi
@@ -360,7 +433,7 @@ namespace ProjectNoel
             //Utilité : La fonction prépare les valeurs du traineau pour son départ.
             public void Depart()
             {
-                if (PileCadeaux.Taille() > 0)
+                if (PileCadeaux.Taille > 0)
                 {
                     Parti = true;
                     TempsAvantRetour = 6;
@@ -456,6 +529,25 @@ namespace ProjectNoel
             }
         }
 
+
+        public class Simulation
+        {
+            //Paramètres de la simulation
+            public Param ParamSimulation;
+
+            //Pile de lettres sur le bureau du Père Noël
+            Pile<Lettre> lettresBureauPereNoel = new Pile<Lettre>{};
+
+            public Simulation()
+            {
+                //Initialisation des paramètres par l'utilisateur
+                ParamSimulation = new Param();
+
+            }
+
+
+
+        }
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
@@ -539,9 +631,9 @@ namespace ProjectNoel
             string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
             string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
             Continents continent = RandomContinent(random.Next(4));// Prend un nombre aléatoire et en fait un Continent
-            Jouet jouet = AgeToJouet(random.Next(18)); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
+            int age = random.Next(18); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
             string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
-            Lettre lettreAléatoire = new Lettre(jouet,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
+            Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
             //Ajoute la lettre à la pile 
             PileDeLettre.Empile(lettreAléatoire);
         }
@@ -559,7 +651,9 @@ namespace ProjectNoel
             //Param Noel = new Param();
 
             //Pile des lettres sur le bureau du Père Noël
-            Pile<Lettre> pileLettres = new Pile<Lettre>{};
+            
+
+            
 
             //----------------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
@@ -567,8 +661,6 @@ namespace ProjectNoel
             //----------------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------------//
             Console.Clear();
-            //----------------------------Jalon 1----------------------------//
-
             //------------Tancrède------------//
             //****Type Jouet****
             Console.WriteLine("-------------Tests type Jouet");
@@ -622,7 +714,7 @@ namespace ProjectNoel
             Console.WriteLine("-------------Tests classe Lettres");
 
             //Création 
-            Lettre lettreTest = new Lettre(Jouet.Tricycle, "Robert", "LEROI", Continents.Afrique, "8 rue Charle De Gaule"); 
+            Lettre lettreTest = new Lettre(7, "Robert", "LEROI", Continents.Afrique, "8 rue Charle De Gaule"); 
 
             //Affichage
             lettreTest.Affiche();
@@ -635,7 +727,6 @@ namespace ProjectNoel
 
             //--------Rémi--------//
 
-            Console.Clear();
 
             //****Classe Nain****
             Console.WriteLine("-------------Tests classe Nain");
