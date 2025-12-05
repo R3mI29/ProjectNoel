@@ -533,7 +533,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Entrepot---------------------------------------------//
         // Auteur : Rémi
-        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensembles.
+        // Utilité : La classe entrepot sert à fabriquer et stocker les jouets qu iarrivent dans les entrepôts des 5 continents.
         public class Entrepot
         {
             public Continents Continent {get; set;} //Le continent qui est attaché à l'entrepôt
@@ -890,3 +890,4 @@ namespace ProjectNoel
     }
 
 }
+
