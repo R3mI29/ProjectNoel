@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection.Metadata;
 using ProjectNoel;
 
@@ -530,24 +531,145 @@ namespace ProjectNoel
         }
 
 
-        public class Simulation
+        //---------------------------------------------Classe Entrepot---------------------------------------------//
+        // Auteur : Rémi
+        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensembles.
+        public class Entrepot
         {
-            //Paramètres de la simulation
-            public Param ParamSimulation;
+            public Continents Continent {get; set;} //Le continent qui est attaché à l'entrepôt
 
-            //Pile de lettres sur le bureau du Père Noël
-            Pile<Lettre> lettresBureauPereNoel = new Pile<Lettre>{};
+            public Pile<Lettre> StockJouet {get; set;} //La pile de jouets de l'entrepôt
 
-            public Simulation()
+            public Entrepot(Continents continent)
             {
-                //Initialisation des paramètres par l'utilisateur
-                ParamSimulation = new Param();
+                Continent = continent;
+                StockJouet = new Pile<Lettre>(); //Initialisation de la pile de jouets
+            }
 
+            //Auteur : Rémi
+            //Fonction/Class : AjouterStock
+            //Paramètres : lettres (Pile<Lettre>)
+            //Renvoie : Void
+            //Utilité : La fonction ajoute les jouets du traineau à la pile de l'entrepôt.
+            public void AjouterStock(Pile<Lettre> lettres)
+            {
+                StockJouet.Empile(lettres.Depile()); // Ajoute les jouets du traineau à la pile de l'entrepôt
             }
 
 
-
+            //Auteur : Rémi
+            //Fonction/Class : EntrepotAffiche
+            //Renvoie : Void
+            //Utilité : La fonction affiche les jouets dans la pile de l'entrepôt.
+            public void EntrepotAffiche()
+            {
+                StockJouet.Affiche(); // Affiche la pile de l'entrepôt
+            }
         }
+
+
+        //---------------------------------------------Classe Simulation---------------------------------------------//
+        // Auteur : Tancrède et Rémi
+        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensembles.
+        public class Simulation
+        {
+            //Paramètres de la simulation
+            public Param? ParamSimulation {get; set;}
+
+            //Pile de lettres sur le bureau du Père Noël
+            public Pile<Lettre> lettresBureauPereNoel {get; set;}
+
+            //File des jouets fabriqués par les lutins mais en attente des nains
+            public File<Lettre> FileAttenteNain {get; set;}
+
+            //Jouets emballés par les nains, en attente d’être chargés par les elfes
+            public File<Lettre> FileAttenteElfes {get; set;}
+
+            //Jouets stockés dans l'entrepot d'Asie
+            public Pile<Lettre> EntrepotAsie {get; set;}
+
+            //Jouets stockés dans l'entrepot d'Europe
+            public Pile<Lettre> EntrepotEurope {get; set;}
+            
+            //Jouets stockés dans l'entrepot d'Amerique
+            public Pile<Lettre> EntrepotAmerique {get; set;}
+
+            //Jouets stockés dans l'entrepot d'Afrique
+            public Pile<Lettre> EntrepotAfrique {get; set;}
+
+            //Jouets stockés dans l'entrepot d'Oceanie
+            public Pile<Lettre> EntrepotOceanie {get; set;}
+
+            //File des Nains
+            public File<Nain> FileNains {get; set;}
+
+            //File des Lutins
+            public File<Lutin> FileLutins {get; set;}
+
+            public Simulation()
+            {
+                //Nettoie l'affichage
+                Console.Clear();
+
+                //Booléen pour sortir la boucle
+                bool continuer = true;
+
+                //Message de bienvenu
+                Console.WriteLine("\n==================================================================================================");
+                Console.WriteLine("                       BIENVENUE DANS LE SIMULATEUR DE GESTION DE PERE NOEL                         ");
+                Console.WriteLine("==================================================================================================");
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Veuillez choisir comment poursuivre : ");
+                Console.WriteLine("    -'LANCEMENT' pour lancer une simulation");
+                Console.WriteLine("    -'QUITTER' pour arrêter le programme");
+                while (continuer)
+                {
+                    string? entreeUser = Console.ReadLine();
+                    if (entreeUser == "LANCEMENT")
+                    {
+                        continuer = false;
+                        //Initialisation des paramètres par l'utilisateur 
+                        ParamSimulation = new Param();
+                    }
+                    else if (entreeUser == "QUITTER")
+                    {
+                        continuer = false;
+                        //On laisse le programme se finir tout seul
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Veuillez rentrer une option valide parmi les choix ci dessus");
+                    }
+
+                    //Déclaration des variables globales indépendantes de l'utilisateur : 
+
+                    //Files et piles que l'on va utiliser
+
+                    lettresBureauPereNoel = new Pile<Lettre>{};
+
+                    FileLutins = new File<Lutin> {} ;
+
+                    FileNains = new File<Nain> {};
+
+                    FileAttenteNain = new File<Lettre> {};
+
+                    FileAttenteElfes = new File<Lettre>{};
+
+                    EntrepotAsie = new Pile<Lettre>{};
+
+                    EntrepotAfrique = new Pile<Lettre>{};
+
+                    EntrepotAmerique = new Pile<Lettre>{};
+
+                    EntrepotEurope = new Pile<Lettre>{};
+
+                    EntrepotOceanie = new Pile<Lettre>{};
+                }
+            }
+        }
+
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
