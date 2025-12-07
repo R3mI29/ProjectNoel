@@ -506,7 +506,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Elfe---------------------------------------------//
         // Auteur : Rémi
-        // Utilité : La classe Elfe sert à créer les elfe qui vont servir à charger les traineaux. Chaque elfe à son continent.
+        // Utilité : La classe Elfe sert à créer les elfes qui vont servir à charger les traineaux. Chaque elfe a son continent.
         public class Elfe
         {
             public Continents Continent {get; set;}
@@ -533,7 +533,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Entrepot---------------------------------------------//
         // Auteur : Rémi
-        // Utilité : La classe entrepot sert à fabriquer et stocker les jouets qu iarrivent dans les entrepôts des 5 continents.
+        // Utilité : La classe entrepot sert à fabriquer et stocker les jouets qui arrivent dans les entrepôts des 5 continents.
         public class Entrepot
         {
             public Continents Continent {get; set;} //Le continent qui est attaché à l'entrepôt
@@ -568,16 +568,17 @@ namespace ProjectNoel
         }
 
 
+        
         //---------------------------------------------Classe Simulation---------------------------------------------//
         // Auteur : Tancrède et Rémi
         // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensembles.
         public class Simulation
         {
             //Paramètres de la simulation
-            public Param? ParamSimulation {get; set;}
+            public Param? ParamSimulation;
 
             //Pile de lettres sur le bureau du Père Noël
-            public Pile<Lettre> lettresBureauPereNoel {get; set;}
+            public Pile<Lettre> LettresBureauPereNoel {get; set;}
 
             //File des jouets fabriqués par les lutins mais en attente des nains
             public File<Lettre> FileAttenteNain {get; set;}
@@ -586,19 +587,19 @@ namespace ProjectNoel
             public File<Lettre> FileAttenteElfes {get; set;}
 
             //Jouets stockés dans l'entrepot d'Asie
-            public Pile<Lettre> EntrepotAsie {get; set;}
+            public Entrepot EntrepotAsie {get; set;}
 
             //Jouets stockés dans l'entrepot d'Europe
-            public Pile<Lettre> EntrepotEurope {get; set;}
+            public Entrepot EntrepotEurope {get; set;}
             
             //Jouets stockés dans l'entrepot d'Amerique
-            public Pile<Lettre> EntrepotAmerique {get; set;}
+            public Entrepot EntrepotAmerique {get; set;}
 
             //Jouets stockés dans l'entrepot d'Afrique
-            public Pile<Lettre> EntrepotAfrique {get; set;}
+            public Entrepot EntrepotAfrique {get; set;}
 
             //Jouets stockés dans l'entrepot d'Oceanie
-            public Pile<Lettre> EntrepotOceanie {get; set;}
+            public Entrepot EntrepotOceanie {get; set;}
 
             //File des Nains
             public File<Nain> FileNains {get; set;}
@@ -647,7 +648,7 @@ namespace ProjectNoel
 
                     //Files et piles que l'on va utiliser
 
-                    lettresBureauPereNoel = new Pile<Lettre>{};
+                    LettresBureauPereNoel = new Pile<Lettre>{};
 
                     FileLutins = new File<Lutin> {} ;
 
@@ -657,15 +658,15 @@ namespace ProjectNoel
 
                     FileAttenteElfes = new File<Lettre>{};
 
-                    EntrepotAsie = new Pile<Lettre>{};
+                    EntrepotAsie = new Entrepot(Continents.Asie);
 
-                    EntrepotAfrique = new Pile<Lettre>{};
+                    EntrepotAfrique = new Entrepot(Continents.Afrique);
 
-                    EntrepotAmerique = new Pile<Lettre>{};
+                    EntrepotAmerique = new Entrepot(Continents.Amerique);
 
-                    EntrepotEurope = new Pile<Lettre>{};
+                    EntrepotEurope = new Entrepot(Continents.Europe);
 
-                    EntrepotOceanie = new Pile<Lettre>{};
+                    EntrepotOceanie = new Entrepot(Continents.Oceanie);
                 }
             }
         }
@@ -841,10 +842,11 @@ namespace ProjectNoel
             //Affichage
             lettreTest.Affiche();
 
+            /*
             //Création et affichage d'une lettre dans la pile des lettres du père Noël
             CreerLettre(pileLettres);
             pileLettres.Affiche();
-
+            */
 
 
             //--------Rémi--------//
@@ -886,8 +888,9 @@ namespace ProjectNoel
             Console.WriteLine($"Le traîneau est-il encore en voyage ? {elfe1.TraineauCont.Parti}");
             Console.WriteLine("Regardons la pile des lettres suite au retour du traîneau :");
             elfe1.TraineauCont.PileCadeaux.Affiche();
+
+            Simulation TestSimul = new Simulation{};
         }
     }
 
 }
-
