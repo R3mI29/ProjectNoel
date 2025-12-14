@@ -69,7 +69,7 @@ namespace ProjectNoel
         //----------------------------------------------------------------------------------------------------------------------//
 
         //---------------------------------------------Classe Param---------------------------------------------//
-        //Auteur : Rémi
+        //Auteur : Rémi, Tancrède
         //Utilité : La class Param sert à demander à l'utilisateur de definir les valeurs qui vont servir le programme durant la suite 
         // de son fonctionement.
         public class Param
@@ -78,18 +78,18 @@ namespace ProjectNoel
             public int NBNains { get; set; } // Nombre maximum de Nains que l'utilisateur autorise
             public int NBJouetsParTraineau { get; set; } // Nombre maximum de jouets par traineau autorisés par l'utilisateur
             public int NBEnfants { get; set; } // Nombre d'enfants qui demandent des cadeaux au Père Noël
-            public int NBLettresParHeures { get; set; } // Nombre de lettres que le Père Noël reçois par heures
+            public int NBLettresParHeures { get; set; } // Nombre de lettres que le Père Noël reçoit par heure
             public Param()
             {
-                Console.WriteLine("Veuillez donner Le nombres de lutins max :");
-                NBLutins = DemandeInt(); // Demande la valeurs de la variables à l'utilisateur en appellant la fonction DemandeInt() 
-                Console.WriteLine("Veuillez donner Le nombres de nains max :");
+                Console.WriteLine("Veuillez donner le nombre maximum de Lutins souhaité :");
+                NBLutins = DemandeInt(); // Demande la valeur de la variable à l'utilisateur en appelant la fonction DemandeInt() 
+                Console.WriteLine("Veuillez donner le nombre maximum de Nains souhaité :");
                 NBNains = DemandeInt();
-                Console.WriteLine("Veuillez donner Le nombres de jouets max par traineau :");
+                Console.WriteLine("Veuillez donner la capactié des traineaux (le nombre maximum de jouets qu'ils peuvent transporter) :");
                 NBJouetsParTraineau = DemandeInt();
-                Console.WriteLine("Veuillez donner Le nombres d'enfants max :");
+                Console.WriteLine("Veuillez donner le nombre d'enfants envoyant des lettres au Père Noël :");
                 NBEnfants = DemandeInt();
-                Console.WriteLine("Veuillez donner Le nombres de lettres par heures :");
+                Console.WriteLine("Veuillez donner le nombre de lettres par heure reçu par les Lutins :");
                 NBLettresParHeures = DemandeInt();
             }
         }
@@ -372,8 +372,71 @@ namespace ProjectNoel
 
         }
         
-        //---------------------------------------------Classe Traineau---------------------------------------------//
+
+        //---------------------------------------------Classe Nain---------------------------------------------//
         // Auteur : Rémi
+        // Utilité : La classe Nain sert à créer les nains, il sont ceux qui emballe les caadeau pour les donnés aux elfes.
+        public class Nain
+        {
+            public EtatTravail Statut {get; set;}
+            public int TempRestant {get; set;}
+            public Lettre? LettreActuelle {get; set;}
+            
+            //Constructeur
+            public Nain()
+            {
+                this.LettreActuelle = null;
+                this.TempRestant = 0;
+                this.Statut = EtatTravail.Attente;
+            }
+
+            //Auteur : Rémi
+            //Fonction/Class : DebutEmballage
+            //Paramètres : lettre (Lettre)
+            //Renvoie : Void
+            //Utilité : La fonction initialise les valeurs du nain pour qu'il puisse commencer à emballer.
+            public void InitEmballage(Lettre lettre)
+            {
+                if(Statut == EtatTravail.Attente && lettre != null)
+                {
+                    LettreActuelle = lettre;
+                    TempRestant = 2;
+                    Statut = EtatTravail.Travail;
+                }
+            }
+
+            //Auteur : Rémi
+            //Fonction/Class : Emballage
+            //Renvoie : Lettre
+            //Utilité : La fonction renvoie les lettres fini et garde le nain occupé aussi longtemps que necessaire.
+            public Lettre Emballage()
+            {
+                if(Statut == EtatTravail.Travail && LettreActuelle != null)
+                {
+                    TempRestant--;
+                    if(TempRestant > 0)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        Lettre lettreFini = LettreActuelle;
+                        LettreActuelle = null;
+                        Statut = EtatTravail.Attente;
+                        return lettreFini;
+                    }
+                }
+                else if (Statut == EtatTravail.Attente)
+                {
+                    return null;
+                }
+                return null;
+            }
+        }
+
+
+        //---------------------------------------------Classe Traineau---------------------------------------------//
+        // Auteur : Rémi, Tancrède
         // Utilité : La classe Traineau sert à Initialiser les traineaux qui serviront pour la livraison des cadeaux
         public class Traineau
         {
@@ -442,70 +505,9 @@ namespace ProjectNoel
             }
         }   
 
-        //---------------------------------------------Classe Nain---------------------------------------------//
-        // Auteur : Rémi
-        // Utilité : La classe Nain sert à créer les nains, il sont ceux qui emballe les caadeau pour les donnés aux elfes.
-        public class Nain
-        {
-            public EtatTravail Statut {get; set;}
-            public int TempRestant {get; set;}
-            public Lettre? LettreActuelle {get; set;}
-            
-            //Constructeur
-            public Nain()
-            {
-                this.LettreActuelle = null;
-                this.TempRestant = 0;
-                this.Statut = EtatTravail.Attente;
-            }
-
-            //Auteur : Rémi
-            //Fonction/Class : DebutEmballage
-            //Paramètres : lettre (Lettre)
-            //Renvoie : Void
-            //Utilité : La fonction initialise les valeurs du nain pour qu'il puisse commencer à emballer.
-            public void InitEmballage(Lettre lettre)
-            {
-                if(Statut == EtatTravail.Attente && lettre != null)
-                {
-                    LettreActuelle = lettre;
-                    TempRestant = 2;
-                    Statut = EtatTravail.Travail;
-                }
-            }
-
-            //Auteur : Rémi
-            //Fonction/Class : Emballage
-            //Renvoie : Lettre
-            //Utilité : La fonction renvoie les lettres fini et garde le nain occupé aussi longtemps que necessaire.
-            public Lettre Emballage()
-            {
-                if(Statut == EtatTravail.Travail && LettreActuelle != null)
-                {
-                    TempRestant--;
-                    if(TempRestant > 0)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        Lettre lettreFini = LettreActuelle;
-                        LettreActuelle = null;
-                        Statut = EtatTravail.Attente;
-                        return lettreFini;
-                    }
-                }
-                else if (Statut == EtatTravail.Attente)
-                {
-                    return null;
-                }
-                return null;
-            }
-        }
-
 
         //---------------------------------------------Classe Elfe---------------------------------------------//
-        // Auteur : Rémi
+        // Auteur : Rémi, Tancrède
         // Utilité : La classe Elfe sert à créer les elfes qui vont servir à charger les traineaux. Chaque elfe a son continent.
         public class Elfe
         {
@@ -513,10 +515,11 @@ namespace ProjectNoel
             public Traineau TraineauCont {get; set;}
 
             //Constructeur
-            public Elfe(Continents continent, int capaciteMax)
+            public Elfe(Continents continent)
             {
                 Continent = continent;
-                TraineauCont = new Traineau(capaciteMax, continent);
+                //On choisit la capacité des traineaux en lettres ici.
+                TraineauCont = new Traineau(10, continent);
             }
 
             //Auteur : Rémi
@@ -607,6 +610,14 @@ namespace ProjectNoel
             //File des Lutins
             public File<Lutin> FileLutins {get; set;}
 
+            //File des Elfes
+            public File<Elfe> FileElfes ;
+
+            //Coût des travailleurs
+            public double CoutParHeure;
+            public double CoutTotal; //Pour le bilan à la fin
+
+            //Constructeur
             public Simulation()
             {
                 //Nettoie l'affichage
@@ -654,23 +665,45 @@ namespace ProjectNoel
 
                     FileNains = new File<Nain> {};
 
+                    FileElfes = new File<Elfe> {};
+
                     FileAttenteNain = new File<Lettre> {};
 
                     FileAttenteElfes = new File<Lettre>{};
 
                     EntrepotAsie = new Entrepot(Continents.Asie);
-
                     EntrepotAfrique = new Entrepot(Continents.Afrique);
-
                     EntrepotAmerique = new Entrepot(Continents.Amerique);
-
                     EntrepotEurope = new Entrepot(Continents.Europe);
-
                     EntrepotOceanie = new Entrepot(Continents.Oceanie);
+
+                    
                 }
             }
-        }
+            //----Méthode Travaille----//
+            //Auteur : Tancrède
+            //Description : Fonction remplissant les différentes files de travailleurs
+            public void CreationTravailleurs()
+            {
+                //Ajout du nombre de Lutins nécessaires dans la file des lutins
+                for (int i = 0; i < ParamSimulation.NBLutins; i++)
+                {
+                    FileLutins.Enfile(new Lutin());
+                }
 
+                //On fait la même chose pour les Nains
+                for (int i = 0; i < ParamSimulation.NBNains; i++)
+                {
+                    FileNains.Enfile(new Nain());
+                }
+                //Et finalement de même pour les Elfes
+                FileElfes.Enfile(new Elfe(Continents.Europe));
+                FileElfes.Enfile(new Elfe(Continents.Asie));
+                FileElfes.Enfile(new Elfe(Continents.Amerique));
+                FileElfes.Enfile(new Elfe(Continents.Oceanie));
+                FileElfes.Enfile(new Elfe(Continents.Afrique));
+            }
+        }
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
@@ -764,132 +797,8 @@ namespace ProjectNoel
 
         public static void Main()
         {
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------Variables globales------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            
-            //Paramètres entrés par l'utilisateur
-            //Param Noel = new Param();
-
-            //Pile des lettres sur le bureau du Père Noël
-            
-
-            
-
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------Test unitaires----------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            //----------------------------------------------------------------------------------------------------------------------//
-            Console.Clear();
-            //------------Tancrède------------//
-            //****Type Jouet****
-            Console.WriteLine("-------------Tests type Jouet");
-            Console.WriteLine($"Le jouet {Jouet.Abonnement} prend {(int)Jouet.Abonnement}h à fabriquer");
-
-            //****Classe File****
-            Console.WriteLine("-------------Tests classe File");
-            //Créer une file vide d'entiers: 
-            File<int> fileTest = new File<int> {};
-
-            //Enfilement des valeurs :
-            fileTest.Enfile(2);
-            fileTest.Enfile(3);
-            fileTest.Enfile(4);
-            fileTest.Enfile(5);
-            fileTest.Affiche();
-            
-            //Defilement d'une valeur : 
-            Console.WriteLine(fileTest.Defile());
-            fileTest.Affiche();
-            Console.WriteLine($"{fileTest.EstVide()}");
-
-            //Vidage de la file
-            fileTest.Vide();
-            fileTest.Affiche();
-            //fileTest.Defile(); --> renvoie une erreur 
-
-            //****Classe Pile****
-            Console.WriteLine("-------------Tests classe Pile");
-            //Créer une pile vide d'entiers :
-            Pile<int> pileTest = new Pile<int> {};
-
-            //Empilement des valeurs
-            pileTest.Empile(2);
-            pileTest.Empile(3);
-            pileTest.Empile(4);
-            pileTest.Empile(5);
-            pileTest.Affiche();
-
-            //Dépilement d'une valeur :
-            Console.WriteLine(pileTest.Depile());
-            pileTest.Affiche();
-            Console.WriteLine($"{pileTest.EstVide()}");
-
-            //Vidage de la pile :
-            pileTest.Vide();
-            pileTest.Affiche();
-            //pileTest.Depile(); --> renvoie une erreur
-
-            //****Classe Lettres****
-            Console.WriteLine("-------------Tests classe Lettres");
-
-            //Création 
-            Lettre lettreTest = new Lettre(7, "Robert", "LEROI", Continents.Afrique, "8 rue Charle De Gaule"); 
-
-            //Affichage
-            lettreTest.Affiche();
-
-            /*
-            //Création et affichage d'une lettre dans la pile des lettres du père Noël
-            CreerLettre(pileLettres);
-            pileLettres.Affiche();
-            */
-
-
-            //--------Rémi--------//
-
-
-            //****Classe Nain****
-            Console.WriteLine("-------------Tests classe Nain");
-
-            //Création d'un nain test
-            Nain nain1 = new Nain();
-
-            //Teste
-            nain1.InitEmballage(lettreTest);
-            nain1.Emballage();
-            nain1.LettreActuelle.Affiche();
-
-            //****Classe Elfe et Traineau****
-            Console.WriteLine("-------------Tests classe Elfe et Traineau");
-
-
-            //Création d'un elfe et donc d'un traîneau
-            Elfe elfe1 = new Elfe(Continents.Afrique, 230);
-
-            //Ajoute une lettre emballée au traineau
-            elfe1.AjouteTraineau(nain1.Emballage());
-            elfe1.TraineauCont.PileCadeaux.Affiche();
-
-            //Test si le traîneau est plein
-            Console.WriteLine($"Le traîneau est'il plein ?  {elfe1.TraineauCont.Plein()}");
-
-            //Teste si le traîneau part avec la fonction Depart
-            elfe1.TraineauCont.Depart();
-            Console.WriteLine($"Test si le traîneau est parti après la fonction Depart ?  {elfe1.TraineauCont.Parti}");
-
-            // Teste de la fonction EnVoyage
-            elfe1.TraineauCont.EnVoyage();
-            elfe1.TraineauCont.TempsAvantRetour = 0;
-            elfe1.TraineauCont.EnVoyage();
-            Console.WriteLine($"Le traîneau est-il encore en voyage ? {elfe1.TraineauCont.Parti}");
-            Console.WriteLine("Regardons la pile des lettres suite au retour du traîneau :");
-            elfe1.TraineauCont.PileCadeaux.Affiche();
-
-            Simulation TestSimul = new Simulation{};
+            Simulation simulation = new Simulation(); 
+            simulation.CreationTravailleurs();
         }
     }
 
