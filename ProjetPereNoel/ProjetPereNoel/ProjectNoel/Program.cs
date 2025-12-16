@@ -79,7 +79,7 @@ namespace ProjectNoel
             public int NBNains { get; set; } // Nombre maximum de Nains que l'utilisateur autorise
             public int NBJouetsParTraineau { get; set; } // Nombre maximum de jouets par traineau autorisés par l'utilisateur
             public int NBEnfants { get; set; } // Nombre d'enfants qui demandent des cadeaux au Père Noël
-            public int NBLettresParHeures { get; set; } // Nombre de lettres que le Père Noël reçoit par heure
+            public int NBLettresParHeures { get; set; } // Nombre maximum de lettres que le Père Noël reçoit par heure
             public Param()
             {
                 Console.WriteLine("Veuillez donner le nombre maximum de Lutins souhaité :");
@@ -93,7 +93,7 @@ namespace ProjectNoel
                 bool temp = false;
                 while(temp != true)
                 {
-                    Console.WriteLine("Veuillez donner le nombre de lettres par heure reçu par les Lutins :");
+                    Console.WriteLine("Veuillez donner le nombre maximum de lettres par heure reçu par les Lutins :");
                     int temp1 = DemandeInt();
                     if(temp1 > NBEnfants)
                     {
@@ -355,7 +355,7 @@ namespace ProjectNoel
             //Auteur : Tancrède
             //Description : renvoie la Lettre du Lutin s'il a fini de fabriquer le jouet 
             //sinon fait descendre le temps restant s'il est au travail et ne renvoie rien sinon
-            public Lettre Travaille()
+            public Lettre? Travaille()
             {
                 //Ne renvoie rien s'il n'est ni au travail ou au repos
                 if (this.Statut != EtatTravail.Repos && this.Statut != EtatTravail.Travail)
@@ -634,7 +634,10 @@ namespace ProjectNoel
         public class Simulation
         {
             //Paramètres de la simulation
-            public Param? ParamSimulation;
+            public Param ParamSimulation;
+
+            //Variable aléatoire de la simulation
+            Random Randomizator = new Random(); // Initialise random
 
             //Pile de lettres sur le bureau du Père Noël
             public Pile<Lettre> LettresBureauPereNoel {get; set;}
@@ -644,6 +647,7 @@ namespace ProjectNoel
 
             //File d'attente des lettres envoyées aux Lutins chaque heure
             public File<Lettre> FileAttenteLutin {get; set;}
+
 
             //Jouets stockés dans l'entrepot d'Asie
             public Entrepot EntrepotAsie {get; set;}
@@ -670,9 +674,12 @@ namespace ProjectNoel
             public File<Elfe> FileElfes ;
 
             //Coût des travailleurs
-            public double CoutParHeure;
+            public double CoutHeure;
             public double CoutTotal; //Pour le bilan à la fin
-            public int NBJoursRequis {get; set;} //Nombre de jours que vont prendre toutes les étapes à ce faire
+
+            //Compteur des jours qui s'écoulent dans la simulation.
+            public int NBJour {get; set;}
+
 
             //Constructeur
             public Simulation()
@@ -734,12 +741,13 @@ namespace ProjectNoel
                     EntrepotEurope = new Entrepot(Continents.Europe);
                     EntrepotOceanie = new Entrepot(Continents.Oceanie);
 
+
                     
                 }
             }
-            //----Méthode Travaille----//
+            //----Méthode CreationTravailleurs----//
             //Auteur : Tancrède
-            //Description : Fonction remplissant les différentes files de travailleurs
+            //Description : Fonction remplissant les différentes files de travailleurs (Nains et Lutins)
             public void CreationTravailleurs()
             {
                 //Ajout du nombre de Lutins nécessaires dans la file des lutins
@@ -753,6 +761,8 @@ namespace ProjectNoel
                 {
                     FileNains.Enfile(new Nain());
                 }
+                
+                //Les elfes ont étés initialisés dans le constructeur
                 //Et finalement de même pour les Elfes
                 FileElfes.Enfile(new Elfe(Continents.Europe, EntrepotEurope));
                 FileElfes.Enfile(new Elfe(Continents.Asie, EntrepotAsie));
@@ -766,43 +776,87 @@ namespace ProjectNoel
             //Description : Fonction qui créer les lettres utilisées par la simulation.
             public void CreationLettres()
             {
-
-                for (int i = 0; i < ParamSimulation.NBEnfants ; i++)
+                int nbLettresAleatoire = Randomizator.Next(ParamSimulation.NBLettresParHeures);
+                
+                while(nbLettresAleatoire > 0 && ParamSimulation.NBEnfants > 0)
                 {
                     LettresBureauPereNoel.Empile(CreerLettre());
+                    ParamSimulation.NBEnfants --;
+                    nbLettresAleatoire--;
                 }
             }
 
 
-            //----Méthode PasserHeure----//
+            //----Méthode CompteCoutHeure----//
             //Auteur : Rémi
+            //Description : Fonction qui renvoie combien les travailleurs coûtent au Père Noël pendant l'heure actuelle.
+            public void CompteCoutHeure()
+            {
+                //Variable qui stocke le coût
+                double Cout = 0.0;
+                
+                //On défile la file des Lutins NBLutin fois et on ajoute leur coût.
+                for(int i = 0; i < ParamSimulation.NBLutins; i++)
+                {
+                    Lutin l = FileLutins.Defile();
+                    if(l.Statut == EtatTravail.Travail)
+                    {
+                        Cout = Cout + 1.5;
+                    }
+                    else
+                    {
+                        Cout = Cout + 1.0;
+                    }
+                    FileLutins.Enfile(l);
+                }
+                //On défile la file des Nains NBNain fois et on ajoute leur coût.
+                for(int i = 0; i < ParamSimulation.NBNains; i++)
+                {
+                    Nain n = FileNains.Defile();
+                    if(n.Statut == EtatTravail.Travail)
+                    {
+                        Cout = Cout + 1.0;
+                    }
+                    else
+                    {
+                        Cout = Cout + 0.5;
+                    }
+                    FileNains.Enfile(n);
+                }
+                //On défile la file des Elfes 5 fois et on ajoute leur coût.
+                for(int i = 0; i < 4 ; i++)
+                {
+                    Elfe e = FileElfes.Defile();
+                    if(e.Statut == EtatTravail.ChargementCadeaux)
+                    {
+                        Cout = Cout + 1.5;
+                    }
+                    else if(e.Statut == EtatTravail.EnVoyage)
+                    {
+                        Cout = Cout + 2.0;
+                    }
+                }
+            }
+        
+
+            //----Méthode PasserHeure----//
+            //Auteur : Rémi, Tancrède
             //Description : Fonction qui fait passer une heure aux fonctions.
             public void PasserHeure()
             {
-                // Gestion des Enfants
+                //--Gestion des Enfants
+                CreationLettres();
 
-                if (ParamSimulation.NBEnfants > 0) // Vérfie qu'il y a encore des enfant à qui il faut préparer les jouets
-                {
-                    for(int i =0; i < ParamSimulation.NBLettresParHeures; i++) 
-                    {
-                        LettresBureauPereNoel.Empile(CreerLettre()); // Créer et ajoute au bureau du père noël le nombre de lettres par heures
-                        ParamSimulation.NBEnfants--;                // Décremente le nombre d'enfants dont il faut s'occuper
-                    }
-                }
-
-                // Gestion des Lutins
-
-                int NBLutins = ParamSimulation.NBLutins;
-                for(int i = 0; i < NBLutins; i++)
+                //--Gestion des Lutins
+                for(int i = 0; i < ParamSimulation.NBLutins; i++)
                 {
                     Lutin l = FileLutins.Defile(); // Selectionne un lutin
-                    if(l.Statut == EtatTravail.Attente && !LettresBureauPereNoel.EstVide()) //Si le lutin est disponible et qu'il y a une lettre à traiter, le faire travailler
+                    if(l.Statut == EtatTravail.Attente && !LettresBureauPereNoel.EstVide())//Si le lutin est disponible et qu'il y a une lettre à traiter, le faire travailler
                     {
                         Lettre LettresATraiter = LettresBureauPereNoel.Depile();            // Prendre une lettre sur le bureau du père noël
                         l.DebutFabricationJouet(LettresATraiter);                           // Le lutin commence la fabrication du jouet
                     }
-
-                    Lettre JouetFini = l.Travaille(); // Le jouet du lutin une fois fini
+                    Lettre? JouetFini = l.Travaille(); // Le jouet du lutin une fois fini
 
                     if(JouetFini != null)
                     {
@@ -811,11 +865,9 @@ namespace ProjectNoel
                     FileLutins.Enfile(l);   // Renvoie le lutin dans la pile des lutins qui ne travaillent pas
                 }
 
-                // Gestion Nains
-
+                //--Gestion Nains
                 Pile<Lettre> CadeauxEmballesCeTour = new Pile<Lettre>{}; // Liste des cadeaux emballés par les nains durant ce tour
-                int NBNains = ParamSimulation.NBNains;
-                for(int i = 0; i < NBNains; i++)
+                for(int i = 0; i < ParamSimulation.NBNains; i++)
                 {
                     Nain n = FileNains.Defile(); // Selectionne un nain
                     if(n.Statut == EtatTravail.Attente && !FileAttenteNain.EstVide()) //Si le nain est disponible et qu'il y a un jouet à emballer, le faire travailler.
@@ -831,9 +883,8 @@ namespace ProjectNoel
                     FileNains.Enfile(n); //Renvoie le nain en état d'attente après qu'il ait travaillé
                 }
 
-                // Gestion Elfes
-
-                for(int i = 0; i < 4; i++)
+                //--Gestion Elfes
+                for(int i = 0; i < 5; i++)
                 {
                     Pile<Lettre> CadeauxAutreContinent = new Pile<Lettre>{}; // Créer une pile de cadeaux pour les cadeaux qui n'ont pas encore été récupérés par l'elfe de leur continent.
                     Elfe e = FileElfes.Defile(); //Prends l'elfe qui est à la fin de la file
@@ -856,51 +907,8 @@ namespace ProjectNoel
                     }
                 }
             }
-
-            public void Cout()
-            {
-                CoutParHeure = 0.0;
-                for(int i = 0; i < ParamSimulation.NBLutins; i++)
-                {
-                    Lutin l = FileLutins.Defile();
-                    if(l.Statut == EtatTravail.Travail)
-                    {
-                        CoutParHeure = CoutParHeure + 1.5;
-                    }
-                    else
-                    {
-                        CoutParHeure = CoutParHeure + 1.0;
-                    }
-                    FileLutins.Enfile(l);
-                }
-                for(int i = 0; i < ParamSimulation.NBNains; i++)
-                {
-                    Nain n = FileNains.Defile();
-                    if(n.Statut == EtatTravail.Travail)
-                    {
-                        CoutParHeure = CoutParHeure + 1.0;
-                    }
-                    else
-                    {
-                        CoutParHeure = CoutParHeure + 0.5;
-                    }
-                    FileNains.Enfile(n);
-                }
-                for(int i = 0; i < 4 ; i++)
-                {
-                    Elfe e = FileElfes.Defile();
-                    if(e.Statut == EtatTravail.ChargementCadeaux)
-                    {
-                        CoutParHeure = CoutParHeure + 1.5;
-                    }
-                    else if(e.Statut == EtatTravail.EnVoyage)
-                    {
-                        CoutParHeure = CoutParHeure + 2.0;
-                    }
-                }
-                CoutTotal = CoutTotal + CoutParHeure;
-            }
         }
+            
 
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
@@ -979,7 +987,7 @@ namespace ProjectNoel
             // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
             string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
             // Initialise une liste des noms (noms aléatoire)
-            string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Durand", "Dubois"}; 
+            string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Kirk", "Durand", "Dubois"}; 
             // Initialise une liste d'adresse (adresses aléatoire)
             string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
             string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
@@ -998,12 +1006,10 @@ namespace ProjectNoel
             Simulation simulation = new Simulation(); 
             simulation.CreationTravailleurs();
             simulation.CreationLettres();
-            /*
             while (simulation.LettresBureauPereNoel.Taille > 0)//Tant que toutes les lettres ne sont pas envoyées
             {
-                
+                simulation.PasserHeure();
             }
-            */
         }
     }
 
