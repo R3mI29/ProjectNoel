@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection.Metadata;
 using ProjectNoel;
 
@@ -89,8 +90,22 @@ namespace ProjectNoel
                 NBJouetsParTraineau = DemandeInt();
                 Console.WriteLine("Veuillez donner le nombre d'enfants envoyant des lettres au Père Noël :");
                 NBEnfants = DemandeInt();
-                Console.WriteLine("Veuillez donner le nombre de lettres par heure reçu par les Lutins :");
-                NBLettresParHeures = DemandeInt();
+                bool temp = false;
+                while(temp != true)
+                {
+                    Console.WriteLine("Veuillez donner le nombre de lettres par heure reçu par les Lutins :");
+                    int temp1 = DemandeInt();
+                    if(temp1 > NBEnfants)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Le nombre de lettres par heure est supérieur au nombres d'enfants, veuillez rentrer une autres valeurs.");
+                    }
+                    else
+                    {
+                        NBLettresParHeures = temp1;
+                        temp = true;
+                    }
+                }
             }
         }
 
@@ -274,9 +289,6 @@ namespace ProjectNoel
                 this.Taille = 0;
             }
         }
-
-
-
         //---------------------------------------------Classe Lettre---------------------------------------------//        
         //Auteur : Tancrède, Rémi
         //Description : classe qui représente une lettre avec trois attributs, le nom et le prénom de l'enfant et le jouet demandé par l'enfant
@@ -484,12 +496,11 @@ namespace ProjectNoel
             //Traineau de l'Elfe
             public Traineau TraineauCont {get; set;}
             //Entrepot auquel l'Elfe est rattaché
-            public Entrepot EntrepotElfe;
+            public Entrepot EntrepotElfe {get; set;}
             //Pile d'attente des lettres que l'elfe traite
-            public Pile<Lettre> PileAtttente ;
-
-            //Booléen true si l'elfe est en voyage
-            public bool Parti { get; set; }
+            public Pile<Lettre> PileAtttente {get; set;}
+            //Etat  de travail de l'elfe
+            public EtatTravail Statut {get; set;}
             //Temps restant au voyage avant le retour de l'elfe
             public int TempsAvantRetour { get; set; }
 
@@ -501,7 +512,7 @@ namespace ProjectNoel
                 TraineauCont = new Traineau(10, continent);
                 EntrepotElfe = entrepot;
                 PileAtttente = new Pile<Lettre> {};
-                Parti = false;
+                Statut = EtatTravail.ChargementCadeaux;
             }
 
             //----Méthode Depart----//
@@ -509,18 +520,18 @@ namespace ProjectNoel
             //Description : Prépare le départ de l'elfe et de son traineau pour le voyage
             public void Depart()
             {
-                Parti = true;
+                Statut = EtatTravail.EnVoyage;
                 TempsAvantRetour = 6;
             }
 
-            //Auteur : Rémi
+            //Auteur : Rémi, Tancrède
             //Fonction/Class : EnVoyages
             //Renvoie : Void
             //Utilité : Simule une heure de voyage : décompte une heure si le voyage n'est pas fini, sinon on vide les cadeaux dans l'entrepôt et 
             //On fait revenir l'elfe
             public void Voyage()
             {
-                if (Parti == true && TempsAvantRetour <= 0)     // test si le voyage est fini.
+                if (Statut == EtatTravail.EnVoyage && TempsAvantRetour <= 0)     // test si le voyage est fini.
                 {
                     if(TempsAvantRetour <= 0)
                     {
@@ -530,7 +541,7 @@ namespace ProjectNoel
                             EntrepotElfe.AjouterStock(TraineauCont.PileCadeaux.Depile());
                         }
                         //L'elfe revient
-                        Parti = false;    
+                        Statut = EtatTravail.ChargementCadeaux;    
                     }
                     else
                     {
@@ -567,7 +578,7 @@ namespace ProjectNoel
             //Description : Fonction qui fait travailler l'elfe : qui lance le voyage si le traineau est plein et sinon remplit le traineau
             public void Travaille()
             {
-                if (Parti == true)
+                if (Statut == EtatTravail.EnVoyage)
                 {
                     Voyage();
                 }
@@ -661,6 +672,7 @@ namespace ProjectNoel
             //Coût des travailleurs
             public double CoutParHeure;
             public double CoutTotal; //Pour le bilan à la fin
+            public int NBJoursRequis {get; set;} //Nombre de jours que vont prendre toutes les étapes à ce faire
 
             //Constructeur
             public Simulation()
@@ -749,7 +761,7 @@ namespace ProjectNoel
                 FileElfes.Enfile(new Elfe(Continents.Afrique, EntrepotAfrique));
             }
 
-             //----Méthode CreationLettres----//
+            //----Méthode CreationLettres----//
             //Auteur : Tancrède
             //Description : Fonction qui créer les lettres utilisées par la simulation.
             public void CreationLettres()
@@ -760,7 +772,136 @@ namespace ProjectNoel
                     LettresBureauPereNoel.Empile(CreerLettre());
                 }
             }
+
+
+            //----Méthode PasserHeure----//
+            //Auteur : Rémi
+            //Description : Fonction qui fait passer une heure aux fonctions.
+            public void PasserHeure()
+            {
+                // Gestion des Enfants
+
+                if (ParamSimulation.NBEnfants > 0) // Vérfie qu'il y a encore des enfant à qui il faut préparer les jouets
+                {
+                    for(int i =0; i < ParamSimulation.NBLettresParHeures; i++) 
+                    {
+                        LettresBureauPereNoel.Empile(CreerLettre()); // Créer et ajoute au bureau du père noël le nombre de lettres par heures
+                        ParamSimulation.NBEnfants--;                // Décremente le nombre d'enfants dont il faut s'occuper
+                    }
+                }
+
+                // Gestion des Lutins
+
+                int NBLutins = ParamSimulation.NBLutins;
+                for(int i = 0; i < NBLutins; i++)
+                {
+                    Lutin l = FileLutins.Defile(); // Selectionne un lutin
+                    if(l.Statut == EtatTravail.Attente && !LettresBureauPereNoel.EstVide()) //Si le lutin est disponible et qu'il y a une lettre à traiter, le faire travailler
+                    {
+                        Lettre LettresATraiter = LettresBureauPereNoel.Depile();            // Prendre une lettre sur le bureau du père noël
+                        l.DebutFabricationJouet(LettresATraiter);                           // Le lutin commence la fabrication du jouet
+                    }
+
+                    Lettre JouetFini = l.Travaille(); // Le jouet du lutin une fois fini
+
+                    if(JouetFini != null)
+                    {
+                        FileAttenteNain.Enfile(JouetFini); // Ajoute le jouet du lutin à la file des jouets que les nains doivent traiter
+                    }
+                    FileLutins.Enfile(l);   // Renvoie le lutin dans la pile des lutins qui ne travaillent pas
+                }
+
+                // Gestion Nains
+
+                Pile<Lettre> CadeauxEmballesCeTour = new Pile<Lettre>{}; // Liste des cadeaux emballés par les nains durant ce tour
+                int NBNains = ParamSimulation.NBNains;
+                for(int i = 0; i < NBNains; i++)
+                {
+                    Nain n = FileNains.Defile(); // Selectionne un nain
+                    if(n.Statut == EtatTravail.Attente && !FileAttenteNain.EstVide()) //Si le nain est disponible et qu'il y a un jouet à emballer, le faire travailler.
+                    {
+                        n.InitEmballage(FileAttenteNain.Defile()); //Lance le travail du nain sur le cadeau
+                    }
+                    Lettre cadeauEmballe = n.Emballage();
+                    if(cadeauEmballe != null) // Si le cadeau est emballé
+                    {
+                        CadeauxEmballesCeTour.Empile(cadeauEmballe); //On l'ajoute aux cadeaux emballés ce tour
+                    }
+
+                    FileNains.Enfile(n); //Renvoie le nain en état d'attente après qu'il ait travaillé
+                }
+
+                // Gestion Elfes
+
+                for(int i = 0; i < 4; i++)
+                {
+                    Pile<Lettre> CadeauxAutreContinent = new Pile<Lettre>{}; // Créer une pile de cadeaux pour les cadeaux qui n'ont pas encore été récupérés par l'elfe de leur continent.
+                    Elfe e = FileElfes.Defile(); //Prends l'elfe qui est à la fin de la file
+                    while(!CadeauxEmballesCeTour.EstVide()) // Tant que la première pile de cadeaux n'est pas vide, continuer de vérifier si l'elfe actuel ne peut pas les prendre
+                    {
+                        Lettre cadeau = CadeauxEmballesCeTour.Depile(); // Sélectionne le cadeau le plus en haut de la pile
+                        if(e.Continent == cadeau.Continent) // on regarde si l'elfe a le même continent que le cadeau
+                        {
+                            e.PileAtttente.Empile(cadeau); // Si oui, on ajoute le cadeau à la pile de l'elfe
+                        }
+                        else
+                        {
+                            CadeauxAutreContinent.Empile(cadeau); //Si non, on ajoute le cadeau à la deuxième pile de cadeaux
+                        }
+                    }
+                    FileElfes.Enfile(e); // On remet l'elfe dans la file des elfes
+                    while(!CadeauxAutreContinent.EstVide())
+                    {
+                        CadeauxEmballesCeTour.Empile(CadeauxAutreContinent.Depile()); // On remet les cadeaux qui étaient dans la deuxième pile, dans la première.
+                    }
+                }
+            }
+
+            public void Cout()
+            {
+                CoutParHeure = 0.0;
+                for(int i = 0; i < ParamSimulation.NBLutins; i++)
+                {
+                    Lutin l = FileLutins.Defile();
+                    if(l.Statut == EtatTravail.Travail)
+                    {
+                        CoutParHeure = CoutParHeure + 1.5;
+                    }
+                    else
+                    {
+                        CoutParHeure = CoutParHeure + 1.0;
+                    }
+                    FileLutins.Enfile(l);
+                }
+                for(int i = 0; i < ParamSimulation.NBNains; i++)
+                {
+                    Nain n = FileNains.Defile();
+                    if(n.Statut == EtatTravail.Travail)
+                    {
+                        CoutParHeure = CoutParHeure + 1.0;
+                    }
+                    else
+                    {
+                        CoutParHeure = CoutParHeure + 0.5;
+                    }
+                    FileNains.Enfile(n);
+                }
+                for(int i = 0; i < 4 ; i++)
+                {
+                    Elfe e = FileElfes.Defile();
+                    if(e.Statut == EtatTravail.ChargementCadeaux)
+                    {
+                        CoutParHeure = CoutParHeure + 1.5;
+                    }
+                    else if(e.Statut == EtatTravail.EnVoyage)
+                    {
+                        CoutParHeure = CoutParHeure + 2.0;
+                    }
+                }
+                CoutTotal = CoutTotal + CoutParHeure;
+            }
         }
+
         //----------------------------------------------------------------------------------------------------------------------//
         //----------------------------------------------------------------------------------------------------------------------//
         //------------------------------------------------------Méthodes--------------------------------------------------------//
