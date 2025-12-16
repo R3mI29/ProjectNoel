@@ -443,8 +443,6 @@ namespace ProjectNoel
             public Continents Continent { get; set; }
             public int CapaciteMax { get; set; }
             public Pile<Lettre> PileCadeaux { get; set; }
-            public bool Parti { get; set; }
-            public int TempsAvantRetour { get; set; }
 
             //Constructeur
             public Traineau(int capacite, Continents continent)
@@ -473,36 +471,6 @@ namespace ProjectNoel
                 return PileCadeaux.Taille >= CapaciteMax;    // teste si le traîneau est plein.
             }
 
-            //Auteur : Rémi
-            //Fonction/Class : EnVoyages
-            //Renvoie : Void
-            //Utilité : La fonction sert à savoir si le traineau à fini la tourné, si oui alors la pile des cadeaux est vidée et parti = false, sinon alors on enlève 1 heure du temps avant son retour et ont dis qu'il est encore en livraison.
-            public void EnVoyage()
-            {
-                if (Parti == true && TempsAvantRetour <= 0)     // test si le voyage est fini.
-                {
-                    Parti = false;                          
-                    PileCadeaux.Vide();                         // Le voyage est fini donc on vide la pile.
-                }
-                else if (Parti == true)
-                {
-                    Console.WriteLine($"Encore en Livraison, il reste encore {TempsAvantRetour}h");
-                    TempsAvantRetour--;
-                }
-            }
-
-            //Auteur : Rémi
-            //Fonction/Class : Depart
-            //Renvoie : Void
-            //Utilité : La fonction prépare les valeurs du traineau pour son départ.
-            public void Depart()
-            {
-                if (PileCadeaux.Taille > 0)
-                {
-                    Parti = true;
-                    TempsAvantRetour = 6;
-                }
-            }
         }   
 
 
@@ -511,25 +479,102 @@ namespace ProjectNoel
         // Utilité : La classe Elfe sert à créer les elfes qui vont servir à charger les traineaux. Chaque elfe a son continent.
         public class Elfe
         {
+            //Continent duquel l'Elfe s'occupe
             public Continents Continent {get; set;}
+            //Traineau de l'Elfe
             public Traineau TraineauCont {get; set;}
+            //Entrepot auquel l'Elfe est rattaché
+            public Entrepot EntrepotElfe;
+            //Pile d'attente des lettres que l'elfe traite
+            public Pile<Lettre> PileAtttente ;
+
+            //Booléen true si l'elfe est en voyage
+            public bool Parti { get; set; }
+            //Temps restant au voyage avant le retour de l'elfe
+            public int TempsAvantRetour { get; set; }
 
             //Constructeur
-            public Elfe(Continents continent)
+            public Elfe(Continents continent, Entrepot entrepot)
             {
                 Continent = continent;
                 //On choisit la capacité des traineaux en lettres ici.
                 TraineauCont = new Traineau(10, continent);
+                EntrepotElfe = entrepot;
+                PileAtttente = new Pile<Lettre> {};
+                Parti = false;
+            }
+
+            //----Méthode Depart----//
+            //Auteur : Tancrède, Rémi
+            //Description : Prépare le départ de l'elfe et de son traineau pour le voyage
+            public void Depart()
+            {
+                Parti = true;
+                TempsAvantRetour = 6;
             }
 
             //Auteur : Rémi
+            //Fonction/Class : EnVoyages
+            //Renvoie : Void
+            //Utilité : Simule une heure de voyage : décompte une heure si le voyage n'est pas fini, sinon on vide les cadeaux dans l'entrepôt et 
+            //On fait revenir l'elfe
+            public void Voyage()
+            {
+                if (Parti == true && TempsAvantRetour <= 0)     // test si le voyage est fini.
+                {
+                    if(TempsAvantRetour <= 0)
+                    {
+                        //On livre les cadeaux dans l'entrepôt              
+                        while (TraineauCont.PileCadeaux.Taille > 0)
+                        {
+                            EntrepotElfe.AjouterStock(TraineauCont.PileCadeaux.Depile());
+                        }
+                        //L'elfe revient
+                        Parti = false;    
+                    }
+                    else
+                    {
+                        //Sinon on décompte une heure du temps de voyage
+                        TempsAvantRetour--;
+                    }
+                    
+                }
+                
+            }
+
+            //Auteur : Rémi, Tancrède
             //Fonction/Class : AjouteTraineau
             //Paramètres : lettre (Lettre)
             //Renvoie : Void
-            //Utilité : La fonction ajoutre au traineau le cadeau que l'elfe a avec lui.
-            public void AjouteTraineau(Lettre lettre)
+            //Utilité : La fonction ajoute au traineau le cadeau que l'elfe a avec lui et l'envoie en voyage si le traineau est plein.
+            public void AjouteTraineau()
             {
-                TraineauCont.ChargeTraineau(lettre);
+                //On ajoute un maximum de cadeaux au traineau (tant que le traineaux n'est pas plein et qu'il y a des cadeaux à ajouter)
+                while(PileAtttente.Taille > 0 && TraineauCont.PileCadeaux.Taille < TraineauCont.CapaciteMax)
+                    {
+                        TraineauCont.ChargeTraineau(PileAtttente.Depile());
+                    }
+                
+                //Si on a rempli le traineau, on part en voyage
+                if(TraineauCont.Plein() == true)
+                {
+                    Depart();
+                }
+            }
+
+            //----Méthode Travaille----//
+            //Auteur : Tancrède
+            //Description : Fonction qui fait travailler l'elfe : qui lance le voyage si le traineau est plein et sinon remplit le traineau
+            public void Travaille()
+            {
+                if (Parti == true)
+                {
+                    Voyage();
+                }
+                else
+                {
+                    AjouteTraineau();
+                }
             }
         }
 
@@ -554,9 +599,9 @@ namespace ProjectNoel
             //Paramètres : lettres (Pile<Lettre>)
             //Renvoie : Void
             //Utilité : La fonction ajoute les jouets du traineau à la pile de l'entrepôt.
-            public void AjouterStock(Pile<Lettre> lettres)
+            public void AjouterStock(Lettre lettre)
             {
-                StockJouet.Empile(lettres.Depile()); // Ajoute les jouets du traineau à la pile de l'entrepôt
+                StockJouet.Empile(lettre); // Ajoute les jouets du traineau à la pile de l'entrepôt
             }
 
 
@@ -586,8 +631,8 @@ namespace ProjectNoel
             //File des jouets fabriqués par les lutins mais en attente des nains
             public File<Lettre> FileAttenteNain {get; set;}
 
-            //Jouets emballés par les nains, en attente d’être chargés par les elfes
-            public File<Lettre> FileAttenteElfes {get; set;}
+            //File d'attente des lettres envoyées aux Lutins chaque heure
+            public File<Lettre> FileAttenteLutin {get; set;}
 
             //Jouets stockés dans l'entrepot d'Asie
             public Entrepot EntrepotAsie {get; set;}
@@ -669,7 +714,7 @@ namespace ProjectNoel
 
                     FileAttenteNain = new File<Lettre> {};
 
-                    FileAttenteElfes = new File<Lettre>{};
+                    FileAttenteLutin = new File<Lettre>{};
 
                     EntrepotAsie = new Entrepot(Continents.Asie);
                     EntrepotAfrique = new Entrepot(Continents.Afrique);
@@ -697,11 +742,23 @@ namespace ProjectNoel
                     FileNains.Enfile(new Nain());
                 }
                 //Et finalement de même pour les Elfes
-                FileElfes.Enfile(new Elfe(Continents.Europe));
-                FileElfes.Enfile(new Elfe(Continents.Asie));
-                FileElfes.Enfile(new Elfe(Continents.Amerique));
-                FileElfes.Enfile(new Elfe(Continents.Oceanie));
-                FileElfes.Enfile(new Elfe(Continents.Afrique));
+                FileElfes.Enfile(new Elfe(Continents.Europe, EntrepotEurope));
+                FileElfes.Enfile(new Elfe(Continents.Asie, EntrepotAsie));
+                FileElfes.Enfile(new Elfe(Continents.Amerique, EntrepotAmerique));
+                FileElfes.Enfile(new Elfe(Continents.Oceanie, EntrepotOceanie));
+                FileElfes.Enfile(new Elfe(Continents.Afrique, EntrepotAfrique));
+            }
+
+             //----Méthode CreationLettres----//
+            //Auteur : Tancrède
+            //Description : Fonction qui créer les lettres utilisées par la simulation.
+            public void CreationLettres()
+            {
+
+                for (int i = 0; i < ParamSimulation.NBEnfants ; i++)
+                {
+                    LettresBureauPereNoel.Empile(CreerLettre());
+                }
             }
         }
         //----------------------------------------------------------------------------------------------------------------------//
@@ -774,8 +831,8 @@ namespace ProjectNoel
 
         //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
         //Auteur : Tancrède, Rémi
-        //Description : Fonction qui génére une lettre aléatoire et l'ajoute dans la pile de lettre sur le bureau du Père Noël prise en paramètre
-        public static void CreerLettre(Pile<Lettre> PileDeLettre)
+        //Description : Fonction qui génére une lettre aléatoire et la retourne
+        public static Lettre CreerLettre()
         {
             Random random = new Random(); // Initialise random
             // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
@@ -790,8 +847,8 @@ namespace ProjectNoel
             int age = random.Next(18); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
             string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
             Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
-            //Ajoute la lettre à la pile 
-            PileDeLettre.Empile(lettreAléatoire);
+            //On retourne la lettre
+            return lettreAléatoire;
         }
 
 
@@ -799,6 +856,13 @@ namespace ProjectNoel
         {
             Simulation simulation = new Simulation(); 
             simulation.CreationTravailleurs();
+            simulation.CreationLettres();
+            /*
+            while (simulation.LettresBureauPereNoel.Taille > 0)//Tant que toutes les lettres ne sont pas envoyées
+            {
+                
+            }
+            */
         }
     }
 
