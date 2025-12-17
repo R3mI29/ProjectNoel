@@ -907,6 +907,48 @@ namespace ProjectNoel
                     }
                 }
             }
+
+            //----Méthode EstTermine----//
+            //Auteur : Tancrède 
+            //Description : Fonction qui renvoie false dans que la simulation n'est pas terminée et true sinon.
+            //La simulation est terminée si :
+            //      - Il n'y a plus de nouvelles lettres à envoyer
+            //      - Les files d'attentes sont vides
+            //      - Tous les travailleurs sont soit au repos, soit en attente
+            //      - Tous les traineau ont complété leur dernière livraison (et sont donc vides)
+            public bool EstTermine()
+            {
+                //Vérifie si aucun des lutins ne sont en train de travailler
+                for(int i = 0 ; i < ParamSimulation.NBLutins ; i++)
+                {
+                    Lutin l = FileLutins.Defile();
+                    FileLutins.Enfile(l);
+                    if (l.Statut == EtatTravail.Travail){return false;}
+                }
+
+                //Vérifie si aucun des nains ne sont en train de travailler
+                for(int i = 0 ; i < ParamSimulation.NBNains ; i++)
+                {
+                    Nain n = FileNains.Defile();
+                    FileNains.Enfile(n);
+                    if (n.Statut == EtatTravail.Travail){return false;}
+                }
+
+                //Vérifie si aucun des elfes ne sont en train de travailler
+                for(int i = 0 ; i < 5 ; i++)
+                {
+                    Elfe e = FileElfes.Defile();
+                    FileElfes.Enfile(e);
+                    if (e.TraineauCont.PileCadeaux.Taille > 0 //Le traineau est-il vide
+                    ||  e.Statut != EtatTravail.EnVoyage //L'elfe est-il toujours en voyage ?
+                    ||  e.PileAtttente.Taille > 0)//Reste-t-il des cadeaux à livrer
+                        {return false;}
+                    
+                }
+                return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
+                        FileAttenteLutin.EstVide() && //Y a-t-il des lettres en attente pour les lutins
+                        FileAttenteNain.EstVide();//Y a-t-il des lettres en attente pour les nains
+            } 
         }
             
 
@@ -1006,7 +1048,7 @@ namespace ProjectNoel
             Simulation simulation = new Simulation(); 
             simulation.CreationTravailleurs();
             simulation.CreationLettres();
-            while (simulation.LettresBureauPereNoel.Taille > 0)//Tant que toutes les lettres ne sont pas envoyées
+            while (simulation.EstTermine() == false)//Tant que toutes les lettres ne sont pas envoyées
             {
                 simulation.PasserHeure();
             }
