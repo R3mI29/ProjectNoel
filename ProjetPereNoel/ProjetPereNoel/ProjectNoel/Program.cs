@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
+using System.Runtime.Serialization;
 using ProjectNoel;
 
 namespace ProjectNoel
@@ -86,7 +87,7 @@ namespace ProjectNoel
                 NBLutins = DemandeInt(); // Demande la valeur de la variable à l'utilisateur en appelant la fonction DemandeInt() 
                 Console.WriteLine("Veuillez donner le nombre maximum de Nains souhaité :");
                 NBNains = DemandeInt();
-                Console.WriteLine("Veuillez donner la capactié des traineaux (le nombre maximum de jouets qu'ils peuvent transporter) :");
+                Console.WriteLine("Veuillez donner la capacité des traineaux (le nombre maximum de jouets qu'ils peuvent transporter) :");
                 NBJouetsParTraineau = DemandeInt();
                 Console.WriteLine("Veuillez donner le nombre d'enfants envoyant des lettres au Père Noël :");
                 NBEnfants = DemandeInt();
@@ -498,20 +499,20 @@ namespace ProjectNoel
             //Entrepot auquel l'Elfe est rattaché
             public Entrepot EntrepotElfe {get; set;}
             //Pile d'attente des lettres que l'elfe traite
-            public Pile<Lettre> PileAtttente {get; set;}
+            public Pile<Lettre> PileAttente {get; set;}
             //Etat  de travail de l'elfe
             public EtatTravail Statut {get; set;}
             //Temps restant au voyage avant le retour de l'elfe
             public int TempsAvantRetour { get; set; }
 
             //Constructeur
-            public Elfe(Continents continent, Entrepot entrepot)
+            public Elfe(Continents continent, Entrepot entrepot, int capaciteTraineau)
             {
                 Continent = continent;
                 //On choisit la capacité des traineaux en lettres ici.
-                TraineauCont = new Traineau(10, continent);
+                TraineauCont = new Traineau(capaciteTraineau, continent);
                 EntrepotElfe = entrepot;
-                PileAtttente = new Pile<Lettre> {};
+                PileAttente = new Pile<Lettre> {};
                 Statut = EtatTravail.ChargementCadeaux;
             }
 
@@ -531,7 +532,7 @@ namespace ProjectNoel
             //On fait revenir l'elfe
             public void Voyage()
             {
-                if (Statut == EtatTravail.EnVoyage && TempsAvantRetour <= 0)     // test si le voyage est fini.
+                if (Statut == EtatTravail.EnVoyage)// test si le voyage est fini.
                 {
                     if(TempsAvantRetour <= 0)
                     {
@@ -561,13 +562,13 @@ namespace ProjectNoel
             public void AjouteTraineau()
             {
                 //On ajoute un maximum de cadeaux au traineau (tant que le traineaux n'est pas plein et qu'il y a des cadeaux à ajouter)
-                while(PileAtttente.Taille > 0 && TraineauCont.PileCadeaux.Taille < TraineauCont.CapaciteMax)
+                while(PileAttente.Taille > 0 && TraineauCont.PileCadeaux.Taille < TraineauCont.CapaciteMax)
                     {
-                        TraineauCont.ChargeTraineau(PileAtttente.Depile());
+                        TraineauCont.ChargeTraineau(PileAttente.Depile());
                     }
                 
                 //Si on a rempli le traineau, on part en voyage
-                if(TraineauCont.Plein() == true)
+                if(TraineauCont.Plein() == true )
                 {
                     Depart();
                 }
@@ -591,7 +592,7 @@ namespace ProjectNoel
 
 
         //---------------------------------------------Classe Entrepot---------------------------------------------//
-        // Auteur : Rémi
+        // Auteur : Rémi, Tancrède
         // Utilité : La classe entrepot sert à fabriquer et stocker les jouets qui arrivent dans les entrepôts des 5 continents.
         public class Entrepot
         {
@@ -616,15 +617,46 @@ namespace ProjectNoel
             }
 
 
-            //Auteur : Rémi
-            //Fonction/Class : EntrepotAffiche
-            //Renvoie : Void
-            //Utilité : La fonction affiche les jouets dans la pile de l'entrepôt.
-            public void EntrepotAffiche()
+            //Auteur : Tancrède
+            //Fonction/Class : EvaluationEntrepot
+            //Description : Affiche le contenu d'un entrepôt 
+            public void EvaluationEntrepot ()
             {
-                StockJouet.Affiche(); // Affiche la pile de l'entrepôt
+                Pile<Lettre> pileTemp = new Pile<Lettre> {};
+
+                //On stocke les valeurs du nombre de jouet par tranche d'âge dans un tableau
+                // position [0] : de 0 à 2 ans, position [1] de 3 à 5 ans et ainsi de suite...
+                int[] tabNbJouetParTrancheDage = [0, 0, 0, 0, 0];//On initialise toutes les valeurs à 0.
+
+                //On compte le nombre de jouets par tranche d'âge dans le stock de l'entrepôt
+                while(StockJouet.Taille > 0)
+                {
+                    Lettre l = StockJouet.Depile();
+                    Jouet j = AgeToJouet(l.Age);
+                    if (j == Jouet.Nounours){tabNbJouetParTrancheDage[0] = tabNbJouetParTrancheDage[0] + 1;}
+                    else if (j == Jouet.Tricycle){tabNbJouetParTrancheDage[1] = tabNbJouetParTrancheDage[1] + 1;}
+                    else if (j == Jouet.Jumelles){tabNbJouetParTrancheDage[2] = tabNbJouetParTrancheDage[2] + 1;}
+                    else if (j == Jouet.Abonnement){tabNbJouetParTrancheDage[3] = tabNbJouetParTrancheDage[3] + 1;}
+                    else if (j == Jouet.Ordinateur){tabNbJouetParTrancheDage[4] = tabNbJouetParTrancheDage[4] + 1;}
+                    pileTemp.Empile(l);
+                }
+
+                //On remet tous les jouets dans l'entrepôt
+                while(pileTemp.Taille > 0)
+                {
+                    StockJouet.Empile(pileTemp.Depile());
+                }
+
+                //----Affichage des résultats
+                Console.WriteLine($"----------Contenu de l'entrepôt en {Continent}");
+                Console.WriteLine($"Nombre de jouets pour les enfants de 0 à 2 ans : {tabNbJouetParTrancheDage[0]}");
+                Console.WriteLine($"Nombre de jouets pour les enfants de 3 à 5 : {tabNbJouetParTrancheDage[1]}");
+                Console.WriteLine($"Nombre de jouets pour les enfants de 6 à 10 ans : {tabNbJouetParTrancheDage[2]}");
+                Console.WriteLine($"Nombre de jouets pour les enfants de 11 à 15 ans : {tabNbJouetParTrancheDage[3]}");
+                Console.WriteLine($"Nombre de jouets pour les enfants de 16 à 18 ans : {tabNbJouetParTrancheDage[4]}");
             }
         }
+        
 
 
         
@@ -764,11 +796,11 @@ namespace ProjectNoel
                 
                 //Les elfes ont étés initialisés dans le constructeur
                 //Et finalement de même pour les Elfes
-                FileElfes.Enfile(new Elfe(Continents.Europe, EntrepotEurope));
-                FileElfes.Enfile(new Elfe(Continents.Asie, EntrepotAsie));
-                FileElfes.Enfile(new Elfe(Continents.Amerique, EntrepotAmerique));
-                FileElfes.Enfile(new Elfe(Continents.Oceanie, EntrepotOceanie));
-                FileElfes.Enfile(new Elfe(Continents.Afrique, EntrepotAfrique));
+                FileElfes.Enfile(new Elfe(Continents.Europe, EntrepotEurope, ParamSimulation.NBJouetsParTraineau));
+                FileElfes.Enfile(new Elfe(Continents.Asie, EntrepotAsie, ParamSimulation.NBJouetsParTraineau));
+                FileElfes.Enfile(new Elfe(Continents.Amerique, EntrepotAmerique, ParamSimulation.NBJouetsParTraineau));
+                FileElfes.Enfile(new Elfe(Continents.Oceanie, EntrepotOceanie, ParamSimulation.NBJouetsParTraineau));
+                FileElfes.Enfile(new Elfe(Continents.Afrique, EntrepotAfrique, ParamSimulation.NBJouetsParTraineau));
             }
 
             //----Méthode CreationLettres----//
@@ -776,7 +808,7 @@ namespace ProjectNoel
             //Description : Fonction qui créer les lettres utilisées par la simulation.
             public void CreationLettres()
             {
-                int nbLettresAleatoire = Randomizator.Next(ParamSimulation.NBLettresParHeures);
+                int nbLettresAleatoire = Randomizator.Next(ParamSimulation.NBLettresParHeures + 1);
                 
                 while(nbLettresAleatoire > 0 && ParamSimulation.NBEnfants > 0)
                 {
@@ -790,7 +822,7 @@ namespace ProjectNoel
             //----Méthode CompteCoutHeure----//
             //Auteur : Rémi
             //Description : Fonction qui renvoie combien les travailleurs coûtent au Père Noël pendant l'heure actuelle.
-            public void CompteCoutHeure()
+            public double CompteCoutHeure()
             {
                 //Variable qui stocke le coût
                 double Cout = 0.0;
@@ -824,7 +856,7 @@ namespace ProjectNoel
                     FileNains.Enfile(n);
                 }
                 //On défile la file des Elfes 5 fois et on ajoute leur coût.
-                for(int i = 0; i < 4 ; i++)
+                for(int i = 0; i < 5 ; i++)
                 {
                     Elfe e = FileElfes.Defile();
                     if(e.Statut == EtatTravail.ChargementCadeaux)
@@ -835,7 +867,9 @@ namespace ProjectNoel
                     {
                         Cout = Cout + 2.0;
                     }
+                    FileElfes.Enfile(e);
                 }
+                return Cout;
             }
         
 
@@ -884,6 +918,7 @@ namespace ProjectNoel
                 }
 
                 //--Gestion Elfes
+                bool finPrepaCadeau = FinPreparationCadeau();
                 for(int i = 0; i < 5; i++)
                 {
                     Pile<Lettre> CadeauxAutreContinent = new Pile<Lettre>{}; // Créer une pile de cadeaux pour les cadeaux qui n'ont pas encore été récupérés par l'elfe de leur continent.
@@ -893,7 +928,7 @@ namespace ProjectNoel
                         Lettre cadeau = CadeauxEmballesCeTour.Depile(); // Sélectionne le cadeau le plus en haut de la pile
                         if(e.Continent == cadeau.Continent) // on regarde si l'elfe a le même continent que le cadeau
                         {
-                            e.PileAtttente.Empile(cadeau); // Si oui, on ajoute le cadeau à la pile de l'elfe
+                            e.PileAttente.Empile(cadeau); // Si oui, on ajoute le cadeau à la pile de l'elfe
                         }
                         else
                         {
@@ -905,7 +940,50 @@ namespace ProjectNoel
                     {
                         CadeauxEmballesCeTour.Empile(CadeauxAutreContinent.Depile()); // On remet les cadeaux qui étaient dans la deuxième pile, dans la première.
                     }
+                    if (DernierVoyage(e) == true)
+                    {
+                        e.Depart();
+                    }
+                    e.Travaille();
                 }
+            }
+
+            //----Méthode FinPreparationCadeau----//
+            //Auteur : Tancrède
+            //Description : Vérifie que toutes les lettres ont étés traitées et que tous les cadeaux ont bien étés préparés et
+            //Qu'ils sont donc au moins dans la file d'attente de leur elfe respectif
+            public bool FinPreparationCadeau()
+            {
+                //Vérifie si aucun des lutins ne sont en train de travailler
+                for(int i = 0 ; i < ParamSimulation.NBLutins ; i++)
+                {
+                    Lutin l = FileLutins.Defile();
+                    FileLutins.Enfile(l);
+                    if (l.Statut == EtatTravail.Travail){return false;}
+                }
+
+                //Vérifie si aucun des nains ne sont en train de travailler
+                for(int i = 0 ; i < ParamSimulation.NBNains ; i++)
+                {
+                    Nain n = FileNains.Defile();
+                    FileNains.Enfile(n);
+                    if (n.Statut == EtatTravail.Travail){return false;}
+                }
+                return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
+                        FileAttenteLutin.EstVide() && //Y a-t-il des lettres en attente pour les lutins
+                        FileAttenteNain.EstVide();//Y a-t-il des lettres en attente pour les nains
+            }
+            //----DernierVoyage----//
+            //Auteur : Tancrède
+            //Description : regarde si c'est bien le dernier voyage que l'elfe va effectuer
+            //Renvoie true si oui et false sinon
+            public bool DernierVoyage(Elfe e)
+            {
+                //Vérifie si c'est bien le dernier voyage de l'elfe
+                if (e.PileAttente.Taille > 0 || e.Statut == EtatTravail.EnVoyage)//Reste-t-il des cadeaux à livrer (en dehors de ceux dans le traineau)
+                    {return false;}
+                    
+                return e.TraineauCont.PileCadeaux.Taille > 0;//L'elfe a-t-il encore des cadeaux dans son traineau
             }
 
             //----Méthode EstTermine----//
@@ -918,142 +996,160 @@ namespace ProjectNoel
             //      - Tous les traineau ont complété leur dernière livraison (et sont donc vides)
             public bool EstTermine()
             {
-                //Vérifie si aucun des lutins ne sont en train de travailler
-                for(int i = 0 ; i < ParamSimulation.NBLutins ; i++)
-                {
-                    Lutin l = FileLutins.Defile();
-                    FileLutins.Enfile(l);
-                    if (l.Statut == EtatTravail.Travail){return true;}
-                }
-
-                //Vérifie si aucun des nains ne sont en train de travailler
-                for(int i = 0 ; i < ParamSimulation.NBNains ; i++)
-                {
-                    Nain n = FileNains.Defile();
-                    FileNains.Enfile(n);
-                    if (n.Statut == EtatTravail.Travail){return true;}
-                }
-
-                //Vérifie si aucun des elfes ne sont en train de travailler
+                //Vérifie si tous les elfes ont finis de livrer les cadeaux
                 for(int i = 0 ; i < 5 ; i++)
                 {
                     Elfe e = FileElfes.Defile();
                     FileElfes.Enfile(e);
                     if (e.TraineauCont.PileCadeaux.Taille > 0 //Le traineau est-il vide
-                    ||  e.Statut != EtatTravail.EnVoyage //L'elfe est-il toujours en voyage ?
-                    ||  e.PileAtttente.Taille > 0)//Reste-t-il des cadeaux à livrer
-                        {return true;}
+                    ||  e.Statut == EtatTravail.EnVoyage //L'elfe est-il toujours en voyage ?
+                    ||  e.PileAttente.Taille > 0)//Reste-t-il des cadeaux à livrer
+                        {return false;}
                     
                 }
-                return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
-                        FileAttenteLutin.EstVide() && //Y a-t-il des lettres en attente pour les lutins
-                        FileAttenteNain.EstVide();//Y a-t-il des lettres en attente pour les nains
-            } 
-        }
-            
 
-        //----------------------------------------------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------------------------------------------//
-        //------------------------------------------------------Méthodes--------------------------------------------------------//
-        //----------------------------------------------------------------------------------------------------------------------//
-        //----------------------------------------------------------------------------------------------------------------------//
-
-        //Auteur : Rémi
-        //Fonction/Class : DemandeInt
-        //Paramètres : Aucun
-        //Renvoie : Int
-        //Utilité : La fonction sert à verifier si ce que l'utilisateur à rentrer est bien un int, et si il est positif.
-        //          Si ce n'est pas le cas, la fonction lui envoie un message d'erreur et lui demande une nouvelle valeur.
-        public static int DemandeInt()
-        {
-            bool condition = false;
-            int Valeur;
-            do
-            {
-                string saisie = Console.ReadLine();
-                condition = int.TryParse(saisie, out Valeur);
-                if (!condition || int.Parse(saisie) < 1)
-                {
-                    Console.WriteLine("Erreur : veuillez entrer un entier valide !");
-                    condition = false;
-                }
-                else
-                {
-                    Valeur = int.Parse(saisie);
-                }
-            } while (!condition);
-            Console.Clear();
-            return Valeur;
-        }
-        
-        //---------------------------------------------Fonction AgeToJouet---------------------------------------------// 
-        //Auteur : Rémi
-        //Fonction/Class : AgetoJouet
-        //Paramètres : age (int)
-        //Renvoie : Jouet
-        //Utilité : La fonction renvoie le type de jouet adapté en fonction de l'âge de l'enfant.
-        //0 et 18 ans
-        public static Jouet AgeToJouet(int age)
-        {
-            // Test si l'âge entrer par l'utisateur est dans compris entre 0 et 18 ans les deux compris, sinon renvoie un erreur.
-            if (age < 0 || age > 18){throw new Exception("L'âge doit être compris entre 0 et 18 ans.");}
-            else if(age < 3){return Jouet.Nounours;}
-            else if(age < 6){return Jouet.Tricycle;}
-            else if(age < 11){return Jouet.Jumelles;}
-            else if(age < 16){return Jouet.Abonnement;}
-            else{return Jouet.Ordinateur;}
-        }
-
-        //---------------------------------------------Fonction RandomContinent---------------------------------------------// 
-        //Auteur : Rémi
-        //Fonction/Class : RandomContinent
-        //Paramètres : nbr (int)
-        //Renvoie : Continents
-        //Utilité : La fonction renvoie un continent en fonction du numero au hazard qui est en paramètre.
-        public static Continents RandomContinent(int nbr)
-        {
-            if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
-            else if(nbr == 0){return Continents.Afrique;}
-            else if(nbr == 1){return Continents.Amerique;}
-            else if(nbr == 2){return Continents.Asie;}
-            else if(nbr == 3){return Continents.Europe;}
-            else{return Continents.Oceanie;}
-        }
-
-        //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
-        //Auteur : Tancrède, Rémi
-        //Description : Fonction qui génére une lettre aléatoire et la retourne
-        public static Lettre CreerLettre()
-        {
-            Random random = new Random(); // Initialise random
-            // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
-            string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
-            // Initialise une liste des noms (noms aléatoire)
-            string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Kirk", "Durand", "Dubois"}; 
-            // Initialise une liste d'adresse (adresses aléatoire)
-            string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
-            string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
-            string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
-            Continents continent = RandomContinent(random.Next(4));// Prend un nombre aléatoire et en fait un Continent
-            int age = random.Next(18); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
-            string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
-            Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
-            //On retourne la lettre
-            return lettreAléatoire;
-        }
-
-
-        public static void Main()
-        {
-            Simulation simulation = new Simulation(); 
-            simulation.CreationTravailleurs();
-            simulation.CreationLettres();
-            while (simulation.EstTermine() == false)//Tant que toutes les lettres ne sont pas envoyées
-            {
-                simulation.PasserHeure();
+                //Vérifie si tous les cadeaux ont bien été traités
+                return FinPreparationCadeau();
             }
+            
+            //----Méthode LancerSimulation----//
+            //Auteur : Rémi 
+            //Description : Fonction lance la gestion des jours et des heures, en affichant pour chaque heure un resumé de ce qu'il s'est passé durant cette dernière.
+            public void LancerSimulation()
+            {
+                this.NBJour = 1;
+                int heureJour = 1;
+                while(heureJour <= 12 && this.EstTermine() == false)
+                {
+                    //On passe l'heure
+                    this.PasserHeure();
+                    //Coût des travailleurs pour cette heure
+                    CoutHeure = CompteCoutHeure();
+                    //Coût total des travailleurs dans la simulation
+                    CoutTotal += CoutHeure;
+
+                    if (this.EstTermine() == true)
+                    {
+                        Console.WriteLine("\n--------------------------------------------------");
+                        Console.WriteLine("Dernière lettre traitée au Jour " + this.NBJour + " à l'heure " + heureJour + " !");
+                        Console.WriteLine("--------------------------------------------------");
+                        Console.WriteLine("Appuyez sur une touche pour voir le Bilan...");
+                        Console.ReadLine();
+                        // this.AfficherBilanFinal();
+                        return;
+                    }
+                    Console.WriteLine("========== FIN DU JOUR " + this.NBJour + " ==========");
+                    this.NBJour++;
+                    Console.WriteLine("Appuyez sur une touche pour commencer le jour suivant...");
+                    Console.ReadLine();
+                }
+            }
+    }
+    //----------------------------------------------------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------------------------------------------------//
+    //------------------------------------------------------Méthodes--------------------------------------------------------//
+    //----------------------------------------------------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------------------------------------------------//
+
+    //Auteur : Rémi
+    //Fonction/Class : DemandeInt
+    //Paramètres : Aucun
+    //Renvoie : Int
+    //Utilité : La fonction sert à verifier si ce que l'utilisateur à rentrer est bien un int, et si il est positif.
+    //          Si ce n'est pas le cas, la fonction lui envoie un message d'erreur et lui demande une nouvelle valeur.
+    public static int DemandeInt()
+    {
+        bool condition = false;
+        int Valeur;
+        do
+        {
+            string saisie = Console.ReadLine();
+            condition = int.TryParse(saisie, out Valeur);
+            if (!condition || int.Parse(saisie) < 1)
+            {
+                Console.WriteLine("Erreur : veuillez entrer un entier valide !");
+                condition = false;
+            }
+            else
+            {
+                Valeur = int.Parse(saisie);
+            }
+        } while (!condition);
+        Console.Clear();
+        return Valeur;
+    }
+    
+    //---------------------------------------------Fonction AgeToJouet---------------------------------------------// 
+    //Auteur : Rémi
+    //Fonction/Class : AgetoJouet
+    //Paramètres : age (int)
+    //Renvoie : Jouet
+    //Utilité : La fonction renvoie le type de jouet adapté en fonction de l'âge de l'enfant.
+    //0 et 18 ans
+    public static Jouet AgeToJouet(int age)
+    {
+        // Test si l'âge entrer par l'utisateur est dans compris entre 0 et 18 ans les deux compris, sinon renvoie un erreur.
+        if(0 <= age && age <= 2){return Jouet.Nounours;}
+        else if(3 <= age && age <= 5){return Jouet.Tricycle;}
+        else if(6 <= age && age <= 10){return Jouet.Jumelles;}
+        else if(11 <= age && age <= 15){return Jouet.Abonnement;}
+        else if(16 <= age && age <= 18) {return Jouet.Ordinateur;}
+        else {throw new Exception("L'âge doit être compris entre 0 et 18 ans.");}
+    }
+
+    //---------------------------------------------Fonction RandomContinent---------------------------------------------// 
+    //Auteur : Rémi
+    //Fonction/Class : RandomContinent
+    //Paramètres : nbr (int)
+    //Renvoie : Continents
+    //Utilité : La fonction renvoie un continent en fonction du numero au hazard qui est en paramètre.
+    public static Continents RandomContinent(int nbr)
+    {
+        if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
+        else if(nbr == 0){return Continents.Afrique;}
+        else if(nbr == 1){return Continents.Amerique;}
+        else if(nbr == 2){return Continents.Asie;}
+        else if(nbr == 3){return Continents.Europe;}
+        else{return Continents.Oceanie;}
+    }
+
+    //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
+    //Auteur : Tancrède, Rémi
+    //Description : Fonction qui génére une lettre aléatoire et la retourne
+    public static Lettre CreerLettre()
+    {
+        Random random = new Random(); // Initialise random
+        // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
+        string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
+        // Initialise une liste des noms (noms aléatoire)
+        string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Kirk", "Durand", "Dubois"}; 
+        // Initialise une liste d'adresse (adresses aléatoire)
+        string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
+        string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
+        string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
+        Continents continent = RandomContinent(random.Next(5));// Prend un nombre aléatoire et en fait un Continent
+        int age = random.Next(19); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
+        string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
+        Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
+        //On retourne la lettre
+        return lettreAléatoire;
+    }
+
+    public static void Main()
+    {
+        Simulation simulation = new Simulation(); 
+        simulation.CreationTravailleurs();
+        simulation.CreationLettres();
+        while (simulation.EstTermine() == false)//Tant que toutes les lettres ne sont pas envoyées
+        {   
+            simulation.PasserHeure();
         }
+        simulation.EntrepotAfrique.EvaluationEntrepot();
+        simulation.EntrepotAmerique.EvaluationEntrepot();
+        simulation.EntrepotAsie.EvaluationEntrepot();
+        simulation.EntrepotEurope.EvaluationEntrepot();
+        simulation.EntrepotOceanie.EvaluationEntrepot();     
     }
 
 }
-
+}
