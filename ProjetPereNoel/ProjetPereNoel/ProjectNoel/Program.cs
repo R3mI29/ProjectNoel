@@ -923,7 +923,7 @@ namespace ProjectNoel
                 {
                     Lutin l = FileLutins.Defile();
                     FileLutins.Enfile(l);
-                    if (l.Statut == EtatTravail.Travail){return false;}
+                    if (l.Statut == EtatTravail.Travail){return true;}
                 }
 
                 //Vérifie si aucun des nains ne sont en train de travailler
@@ -931,7 +931,7 @@ namespace ProjectNoel
                 {
                     Nain n = FileNains.Defile();
                     FileNains.Enfile(n);
-                    if (n.Statut == EtatTravail.Travail){return false;}
+                    if (n.Statut == EtatTravail.Travail){return true;}
                 }
 
                 //Vérifie si aucun des elfes ne sont en train de travailler
@@ -942,7 +942,7 @@ namespace ProjectNoel
                     if (e.TraineauCont.PileCadeaux.Taille > 0 //Le traineau est-il vide
                     ||  e.Statut != EtatTravail.EnVoyage //L'elfe est-il toujours en voyage ?
                     ||  e.PileAtttente.Taille > 0)//Reste-t-il des cadeaux à livrer
-                        {return false;}
+                        {return true;}
                     
                 }
                 return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
@@ -1056,3 +1056,4 @@ namespace ProjectNoel
     }
 
 }
+
