@@ -72,8 +72,8 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Param---------------------------------------------//
         //Auteur : Rémi, Tancrède
-        //Utilité : La class Param sert à demander à l'utilisateur de definir les valeurs qui vont servir le programme durant la suite 
-        // de son fonctionement.
+        //Utilité : La classe Param sert à demander à l'utilisateur de définir les valeurs qui vont servir le programme durant la suite 
+        // de son fonctionnement.
         public class Param
         {
             public int NBLutins { get; set; } // Nombre maximum de Lutins que l'utilisateur autorise
@@ -83,6 +83,7 @@ namespace ProjectNoel
             public int NBLettresParHeures { get; set; } // Nombre maximum de lettres que le Père Noël reçoit par heure
             public Param()
             {
+                Console.Clear();
                 Console.WriteLine("Veuillez donner le nombre maximum de Lutins souhaité :");
                 NBLutins = DemandeInt(); // Demande la valeur de la variable à l'utilisateur en appelant la fonction DemandeInt() 
                 Console.WriteLine("Veuillez donner le nombre maximum de Nains souhaité :");
@@ -99,7 +100,7 @@ namespace ProjectNoel
                     if(temp1 > NBEnfants)
                     {
                         Console.Clear();
-                        Console.WriteLine("Le nombre de lettres par heure est supérieur au nombres d'enfants, veuillez rentrer une autres valeurs.");
+                        Console.WriteLine("Le nombre de lettres par heure est supérieur au nombre d'enfants, veuillez rentrer une autres valeurs.");
                     }
                     else
                     {
@@ -167,7 +168,7 @@ namespace ProjectNoel
 
             //----Méthode Affiche----//
             //Auteur : Tancrède
-            //Description : fonction qui affiche le contenu de la file et son sens de défilage
+            //Description : fonction qui affiche le contenu de la file et son sens de défilement
             public void Affiche()
             {
                 if (this.EstVide()) {Console.WriteLine("La file est vide");}
@@ -258,7 +259,7 @@ namespace ProjectNoel
 
             //----Méthode Affiche----//
             //Auteur : Tancrède
-            //Description : affiche le contenu de la pile et le sens dans laquelle elle va.
+            //Description : affiche le contenu de la pile et le sens dans lequel elle va.
             public void Affiche()
             {
                 if (this.EstVide()){Console.WriteLine("La pile est vide");}
@@ -320,7 +321,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Lutin---------------------------------------------//
         //Auteur : Tancrède
-        //Description : classe représentant les lutins, leurs attributs et leurs méthodes qui leurs sont utiles pour la fabrications des cadeaux
+        //Description : classe représentant les lutins, leurs attributs et leurs méthodes qui leur sont utiles pour la fabrication des cadeaux
         public class Lutin
         {
             
@@ -388,7 +389,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Nain---------------------------------------------//
         // Auteur : Rémi
-        // Utilité : La classe Nain sert à créer les nains, il sont ceux qui emballe les caadeau pour les donnés aux elfes.
+        // Utilité : La classe Nain sert à créer les nains, ils sont ceux qui emballent les cadeau pour les donnés aux elfes.
         public class Nain
         {
             public EtatTravail Statut {get; set;}
@@ -421,7 +422,7 @@ namespace ProjectNoel
             //Auteur : Rémi
             //Fonction/Class : Emballage
             //Renvoie : Lettre
-            //Utilité : La fonction renvoie les lettres fini et garde le nain occupé aussi longtemps que necessaire.
+            //Utilité : La fonction renvoie les lettres finies et garde le nain occupé aussi longtemps que necessaire.
             public Lettre Emballage()
             {
                 if(Statut == EtatTravail.Travail && LettreActuelle != null)
@@ -450,7 +451,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Traineau---------------------------------------------//
         // Auteur : Rémi, Tancrède
-        // Utilité : La classe Traineau sert à Initialiser les traineaux qui serviront pour la livraison des cadeaux
+        // Utilité : La classe Traineau sert à initialiser les traineaux qui serviront pour la livraison des cadeaux
         public class Traineau
         {
             public Continents Continent { get; set; }
@@ -478,7 +479,7 @@ namespace ProjectNoel
             //Auteur : Rémi
             //Fonction/Class : Plein
             //Renvoie : bool
-            //Utilité : La fonction renvoie un bool qui nous dis si le traineau est plein
+            //Utilité : La fonction renvoie un bool qui nous dit si le traineau est plein
             public bool Plein()
             {
                 return PileCadeaux.Taille >= CapaciteMax;    // teste si le traîneau est plein.
@@ -662,7 +663,7 @@ namespace ProjectNoel
         
         //---------------------------------------------Classe Simulation---------------------------------------------//
         // Auteur : Tancrède et Rémi
-        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensembles.
+        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensemble.
         public class Simulation
         {
             //Paramètres de la simulation
@@ -707,10 +708,25 @@ namespace ProjectNoel
 
             //Coût des travailleurs
             public double CoutHeure;
-            public double CoutTotal; //Pour le bilan à la fin
+
+            //Pour le bilan à la fin
+            public double CoutTotal; 
 
             //Compteur des jours qui s'écoulent dans la simulation.
             public int NBJour {get; set;}
+
+            //Condition de relance de la simulation
+            public bool VeutRelancer {get; set;} 
+
+            //Condition pour quitter la simulation
+            public bool VeutArrêter {get; set;}
+
+            //Compteur d'heures qui s'écoulent dans la simulation.
+            public int NBHeure {get; set;}
+
+            //Temps de repos des nains et des lutins
+            public int tempsReposLutins;
+            public int tempsReposNains;
 
 
             //Constructeur
@@ -722,7 +738,7 @@ namespace ProjectNoel
                 //Booléen pour sortir la boucle
                 bool continuer = true;
 
-                //Message de bienvenu
+                //Message de bienvenue
                 Console.WriteLine("\n==================================================================================================");
                 Console.WriteLine("                       BIENVENUE DANS LE SIMULATEUR DE GESTION DE PERE NOEL                         ");
                 Console.WriteLine("==================================================================================================");
@@ -743,6 +759,7 @@ namespace ProjectNoel
                     else if (entreeUser == "QUITTER")
                     {
                         continuer = false;
+                        this.VeutArrêter = true;
                         //On laisse le programme se finir tout seul
                         return;
                     }
@@ -777,6 +794,7 @@ namespace ProjectNoel
                     
                 }
             }
+
             //----Méthode CreationTravailleurs----//
             //Auteur : Tancrède
             //Description : Fonction remplissant les différentes files de travailleurs (Nains et Lutins)
@@ -794,7 +812,7 @@ namespace ProjectNoel
                     FileNains.Enfile(new Nain());
                 }
                 
-                //Les elfes ont étés initialisés dans le constructeur
+                //Les elfes ont été initialisés dans le constructeur
                 //Et finalement de même pour les Elfes
                 FileElfes.Enfile(new Elfe(Continents.Europe, EntrepotEurope, ParamSimulation.NBJouetsParTraineau));
                 FileElfes.Enfile(new Elfe(Continents.Asie, EntrepotAsie, ParamSimulation.NBJouetsParTraineau));
@@ -805,10 +823,10 @@ namespace ProjectNoel
 
             //----Méthode CreationLettres----//
             //Auteur : Tancrède
-            //Description : Fonction qui créer les lettres utilisées par la simulation.
+            //Description : Fonction qui crée les lettres utilisées par la simulation.
             public void CreationLettres()
             {
-                int nbLettresAleatoire = Randomizator.Next(ParamSimulation.NBLettresParHeures + 1);
+                int nbLettresAleatoire = Randomizator.Next(1,ParamSimulation.NBLettresParHeures + 1);
                 
                 while(nbLettresAleatoire > 0 && ParamSimulation.NBEnfants > 0)
                 {
@@ -827,7 +845,7 @@ namespace ProjectNoel
                 //Variable qui stocke le coût
                 double Cout = 0.0;
                 
-                //On défile la file des Lutins NBLutin fois et on ajoute leur coût.
+                //On défile la file des Lutins NBLutin fois et on ajoute leur coût en fonction de leur activité.
                 for(int i = 0; i < ParamSimulation.NBLutins; i++)
                 {
                     Lutin l = FileLutins.Defile();
@@ -841,7 +859,7 @@ namespace ProjectNoel
                     }
                     FileLutins.Enfile(l);
                 }
-                //On défile la file des Nains NBNain fois et on ajoute leur coût.
+                //On défile la file des Nains NBNain fois et on ajoute leur coût en fonction de leur activité.
                 for(int i = 0; i < ParamSimulation.NBNains; i++)
                 {
                     Nain n = FileNains.Defile();
@@ -855,7 +873,7 @@ namespace ProjectNoel
                     }
                     FileNains.Enfile(n);
                 }
-                //On défile la file des Elfes 5 fois et on ajoute leur coût.
+                //On défile la file des Elfes 5 fois et on ajoute leur coût en fonction de leur activité.
                 for(int i = 0; i < 5 ; i++)
                 {
                     Elfe e = FileElfes.Defile();
@@ -913,7 +931,6 @@ namespace ProjectNoel
                     {
                         CadeauxEmballesCeTour.Empile(cadeauEmballe); //On l'ajoute aux cadeaux emballés ce tour
                     }
-
                     FileNains.Enfile(n); //Renvoie le nain en état d'attente après qu'il ait travaillé
                 }
 
@@ -971,6 +988,7 @@ namespace ProjectNoel
                 }
                 return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
                         FileAttenteLutin.EstVide() && //Y a-t-il des lettres en attente pour les lutins
+                        LettresBureauPereNoel.EstVide() && //Y a-t-il des lettres en attente sur le bureau du père noël
                         FileAttenteNain.EstVide();//Y a-t-il des lettres en attente pour les nains
             }
             //----DernierVoyage----//
@@ -1014,142 +1032,734 @@ namespace ProjectNoel
             
             //----Méthode LancerSimulation----//
             //Auteur : Rémi 
-            //Description : Fonction lance la gestion des jours et des heures, en affichant pour chaque heure un resumé de ce qu'il s'est passé durant cette dernière.
-            public void LancerSimulation()
+            // Description : Cette fonction lance la gestion des jours et des heures, en affichant pour chaque heure un résumé de ce qu'il s'est passé durant cette dernière.
+            //               La fonction fait aussi l'ajout des coûts des travailleurs.
+            public void Lancer()
             {
-                this.NBJour = 1;
-                int heureJour = 1;
-                while(heureJour <= 12 && this.EstTermine() == false)
+                this.NBJour = 1; //Initialise le nombre de jour à 1
+                this.CoutTotal = 0; //Initialise le nombre de pièces dues à 1
+                while (this.EstTermine() == false && this.VeutRelancer == false) //Tant que ce n'est pas fini ou que l'utilisateur ne veut pas quitter
                 {
-                    //On passe l'heure
-                    this.PasserHeure();
-                    //Coût des travailleurs pour cette heure
-                    CoutHeure = CompteCoutHeure();
-                    //Coût total des travailleurs dans la simulation
-                    CoutTotal += CoutHeure;
-
-                    if (this.EstTermine() == true)
+                    for (int heure = 1; heure <= 12; heure++)//Passe les heures de la journée
                     {
-                        Console.WriteLine("\n--------------------------------------------------");
-                        Console.WriteLine("Dernière lettre traitée au Jour " + this.NBJour + " à l'heure " + heureJour + " !");
-                        Console.WriteLine("--------------------------------------------------");
-                        Console.WriteLine("Appuyez sur une touche pour voir le Bilan...");
-                        Console.ReadLine();
-                        // this.AfficherBilanFinal();
-                        return;
+                        // On calcule ce qui se passe durant cette heure
+                        this.PasserHeure();
+                        this.CoutHeure = this.CompteCoutHeure();
+                        this.CoutTotal += this.CompteCoutHeure();
+                        this.NBHeure ++;
+
+                        // On affiche le menu et on demande le choix
+                        string? temp = AfficherBilanHeure(heure, NBJour);
+
+
+                        // Gestion de cas où le dernier cadeau a été livré
+                        if (this.EstTermine() == true)
+                        {
+                            Console.WriteLine("\n--------------------------------------------------");
+                            Console.WriteLine("Dernière lettre traitée au Jour " + this.NBJour + " à l'heure " + heure + " !");
+                            Console.WriteLine("--------------------------------------------------");
+                            Console.WriteLine("Appuyez sur une touche pour quitter...");
+                            Console.ReadLine();
+                            AfficherBilanFinal();
+                            return;
+                        }
+                        // Gestion du saut de jour
+                        else if(temp == "jour")
+                        {
+                            Console.WriteLine(">>> Avance rapide jusqu'à la fin de la journée... Veuillez patienter.");
+                            
+                            // On boucle sur les heures restantes
+                            for (int hRestante = heure ; hRestante <= 12; hRestante++)
+                            {
+                                // On fait travailler tout le monde sans afficher le menu
+                                this.PasserHeure();
+                                this.CoutHeure = this.CompteCoutHeure();
+                                this.CoutTotal += this.CoutHeure;
+                                this.NBHeure ++;
+
+                                // Il faut quand même vérifier si la simulation se termine pendant l'avance rapide
+                                if (this.EstTermine() == true)
+                                {
+                                    Console.WriteLine($"\nLa simulation s'est terminée pendant l'avance rapide au jour {NBJour}, heure {hRestante}.");
+                                    Console.ReadLine();
+                                    AfficherBilanFinal();
+                                    return;
+                                }
+                            }
+                            heure = 12;// On règle la valeur à 12 car, ainsi, la boucle "for" réinitialisera l'heure à 0 et incrémentera le jour (jour + 1).
+                        }
+                        // Gestion du cas où l'utilisateur veut quitter la simulation
+                        else if(temp == "quitter")
+                        {
+                            AfficherBilanFinal();
+                            this.VeutArrêter = true;
+                            return;
+                        }
+                        // Gestion du cas où l'utilisateur veut relancer une simulation
+                        else if(temp == "relancer")
+                        {
+                            AfficherBilanFinal();
+                            this.VeutRelancer = true;
+                            return;
+                        }
                     }
+                    // Fin de la journée
                     Console.WriteLine("========== FIN DU JOUR " + this.NBJour + " ==========");
                     this.NBJour++;
                     Console.WriteLine("Appuyez sur une touche pour commencer le jour suivant...");
                     Console.ReadLine();
                 }
             }
-    }
-    //----------------------------------------------------------------------------------------------------------------------//
-    //----------------------------------------------------------------------------------------------------------------------//
-    //------------------------------------------------------Méthodes--------------------------------------------------------//
-    //----------------------------------------------------------------------------------------------------------------------//
-    //----------------------------------------------------------------------------------------------------------------------//
 
-    //Auteur : Rémi
-    //Fonction/Class : DemandeInt
-    //Paramètres : Aucun
-    //Renvoie : Int
-    //Utilité : La fonction sert à verifier si ce que l'utilisateur à rentrer est bien un int, et si il est positif.
-    //          Si ce n'est pas le cas, la fonction lui envoie un message d'erreur et lui demande une nouvelle valeur.
-    public static int DemandeInt()
-    {
-        bool condition = false;
-        int Valeur;
-        do
-        {
-            string saisie = Console.ReadLine();
-            condition = int.TryParse(saisie, out Valeur);
-            if (!condition || int.Parse(saisie) < 1)
-            {
-                Console.WriteLine("Erreur : veuillez entrer un entier valide !");
-                condition = false;
+
+            //----Méthode AfficherBilanHeure----//
+            //Auteur : Rémi 
+            //Description : Bilan de l'heure qui vient de s'écouler, et affichage des infos pratique au père noël
+            public string AfficherBilanHeure(int heure, int jour)
+            {                
+                string? temp = "";
+                while(temp != "suivant" && temp != "jour" && temp !="quitter" && temp !="relancer") // Vérifie si l'utilisateur veut avancer le temps ou quitter le bilan
+                {
+                    Console.Clear();
+                    Console.WriteLine("\n=========================================================");
+                    Console.WriteLine($"∣∣-------------Bilan de L'heure " + heure + " du Jour "+ jour +"------------∣∣");
+                    Console.WriteLine("=========================================================");
+                    Console.WriteLine("∣∣-> 1         pour le menu de gestion des nains       ∣∣");
+                    Console.WriteLine("∣∣-> 2         pour le menu de gestion des lutins      ∣∣");
+                    Console.WriteLine("∣∣-> 3         pour voir les stocks dans les entrepots ∣∣");
+                    Console.WriteLine("∣∣-> 4         pour voir le nombre de pièces dépensées ∣∣");
+                    Console.WriteLine("∣∣-> suivant   pour passer à l'heure suivante          ∣∣");
+                    Console.WriteLine("∣∣-> jour      pour passer au prochain jour            ∣∣");
+                    Console.WriteLine("∣∣-> relancer  pour relancer une nouvelle simulation   ∣∣");
+                    Console.WriteLine("∣∣-> quitter   pour arrêter la simulation              ∣∣");
+                    Console.WriteLine("=========================================================");
+                    temp = Console.ReadLine();
+                    if(temp == "1") // Si l'utilisateur veut gérer les nains
+                    {
+                        GestionNains();
+                    }
+                    else if(temp == "2") // Si l'utilisateur veut gérer les lutins
+                    {
+                        GestionLutins();
+                    }
+                    else if(temp == "3")// Si l'utilisateur veut regarder les entrepôts
+                    {
+                        AfficherEntrepot();
+                    }
+                    else if(temp == "4")// Si l'utilisateur veut regarder ses dépenses
+                    {
+                        MenuDesDepences();
+                    }
+                    else if(temp == "quitter" || temp == "jour" || temp == "suivant" || temp == "relancer") // Si l'utilisateur veut quitter ou avancer la simulation
+                    {
+                        return temp;
+                    }
+                }
+                return temp;
             }
-            else
+
+            //----Méthode MenuDesDepences----//
+            //Auteur : Rémi 
+            //Description : Affiche les pièces que le Père Noël doit payer à ses travailleurs.
+            public void MenuDesDepences()
             {
-                Valeur = int.Parse(saisie);
+                Console.Clear();
+                Console.WriteLine("\n===============================================================================");
+                Console.WriteLine($"∣∣--------------------------Menu de Gestion des Dépenses--------------------∣∣");
+                Console.WriteLine("===============================================================================");
+                Console.WriteLine("∣∣                                                                          ∣∣");
+                Console.WriteLine("∣∣   Nombre de pièces dépensée durant le tour "+this.CoutHeure+"                         ∣∣");
+                Console.WriteLine("∣∣   Nombre de pièces dépensée depuis le début "+this.CoutTotal+"                        ∣∣");
+                Console.WriteLine("∣∣                                                                          ∣∣");
+                Console.WriteLine("===============================================================================");
+                Console.WriteLine();
+                Console.WriteLine("Appuyez sur une touche pour revenir au menu de l'heure...");
+                string? temp = Console.ReadLine();
             }
-        } while (!condition);
-        Console.Clear();
-        return Valeur;
-    }
-    
-    //---------------------------------------------Fonction AgeToJouet---------------------------------------------// 
-    //Auteur : Rémi
-    //Fonction/Class : AgetoJouet
-    //Paramètres : age (int)
-    //Renvoie : Jouet
-    //Utilité : La fonction renvoie le type de jouet adapté en fonction de l'âge de l'enfant.
-    //0 et 18 ans
-    public static Jouet AgeToJouet(int age)
-    {
-        // Test si l'âge entrer par l'utisateur est dans compris entre 0 et 18 ans les deux compris, sinon renvoie un erreur.
-        if(0 <= age && age <= 2){return Jouet.Nounours;}
-        else if(3 <= age && age <= 5){return Jouet.Tricycle;}
-        else if(6 <= age && age <= 10){return Jouet.Jumelles;}
-        else if(11 <= age && age <= 15){return Jouet.Abonnement;}
-        else if(16 <= age && age <= 18) {return Jouet.Ordinateur;}
-        else {throw new Exception("L'âge doit être compris entre 0 et 18 ans.");}
-    }
 
-    //---------------------------------------------Fonction RandomContinent---------------------------------------------// 
-    //Auteur : Rémi
-    //Fonction/Class : RandomContinent
-    //Paramètres : nbr (int)
-    //Renvoie : Continents
-    //Utilité : La fonction renvoie un continent en fonction du numero au hazard qui est en paramètre.
-    public static Continents RandomContinent(int nbr)
-    {
-        if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
-        else if(nbr == 0){return Continents.Afrique;}
-        else if(nbr == 1){return Continents.Amerique;}
-        else if(nbr == 2){return Continents.Asie;}
-        else if(nbr == 3){return Continents.Europe;}
-        else{return Continents.Oceanie;}
-    }
 
-    //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
-    //Auteur : Tancrède, Rémi
-    //Description : Fonction qui génére une lettre aléatoire et la retourne
-    public static Lettre CreerLettre()
-    {
-        Random random = new Random(); // Initialise random
-        // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
-        string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
-        // Initialise une liste des noms (noms aléatoire)
-        string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Kirk", "Durand", "Dubois"}; 
-        // Initialise une liste d'adresse (adresses aléatoire)
-        string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
-        string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
-        string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
-        Continents continent = RandomContinent(random.Next(5));// Prend un nombre aléatoire et en fait un Continent
-        int age = random.Next(19); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
-        string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
-        Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
-        //On retourne la lettre
-        return lettreAléatoire;
-    }
+            //----Méthode AfficherEntrepot----//
+            //Auteur : Rémi 
+            //Description : Organise la présentation et affiche le contenu des entrepôts.
+            public void AfficherEntrepot()
+            {
+                string? temp = "";
+                while(temp != "retour") //Jusqu'au retour au menu principal après consultation du bilan.
+                {
+                    Console.Clear();
+                    Console.WriteLine("\n===============================================================================");
+                    Console.WriteLine($"∣∣--------------------------Menu de Gestion des Entrepôts--------------------∣∣");
+                    Console.WriteLine("===============================================================================");
+                    Console.WriteLine("∣∣-> 1       pour verifier le stock de l'entrepôt en Asie                    ∣∣");
+                    Console.WriteLine("∣∣-> 2       pour verifier le stock de l'entrepôt en Europe                  ∣∣");
+                    Console.WriteLine("∣∣-> 3       pour verifier le stock de l'entrepôt en Afrique                 ∣∣");
+                    Console.WriteLine("∣∣-> 4       pour verifier le stock de l'entrepôt en Amérique                ∣∣");
+                    Console.WriteLine("∣∣-> 5       pour verifier le stock de l'entrepôt en Océanie                 ∣∣");
+                    Console.WriteLine("∣∣-> retour  pour revenir sur le bilan de l'heure                            ∣∣");
+                    Console.WriteLine("===============================================================================");
+                    temp = Console.ReadLine();// Attend le choix de l'utilisateur
+                    if(temp == "1")
+                    {
+                        Console.Clear();
+                        EntrepotAsie.EvaluationEntrepot();// Affiche le contenu de l'entrepôt d'Asie
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Appuyer sur une touche pour revenir sur le menu de gestion des entrepôts...");
+                        Console.ReadLine();
+                    }
+                    else if(temp == "2")
+                    {
+                        Console.Clear();
+                        EntrepotEurope.EvaluationEntrepot();// Affiche le contenu de l'entrepôt d'Europe
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Appuyer sur une touche pour revenir sur le menu de gestion des entrepôts...");
+                        Console.ReadLine();
+                    }
+                    else if(temp == "3")
+                    {
+                        Console.Clear();
+                        EntrepotAfrique.EvaluationEntrepot();// Affiche le contenu de l'entrepôt d'Afrique
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Appuyer sur une touche pour revenir sur le menu de gestion des entrepôts...");
+                        Console.ReadLine();
+                    }
+                    else if(temp == "4")
+                    {
+                        Console.Clear();
+                        EntrepotAmerique.EvaluationEntrepot();// Affiche le contenu de l'entrepôt d'Amérique
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Appuyer sur une touche pour revenir sur le menu de gestion des entrepôts...");
+                        Console.ReadLine();
+                    }
+                    else if(temp == "5")
+                    {
+                        Console.Clear();
+                        EntrepotOceanie.EvaluationEntrepot();// Affiche le contenu de l'entrepôt d'Océanie
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Appuyer sur une touche pour revenir sur le menu de gestion des entrepôts...");
+                        Console.ReadLine();
+                    }
+                }
+            }
 
-    public static void Main()
-    {
-        Simulation simulation = new Simulation(); 
-        simulation.CreationTravailleurs();
-        simulation.CreationLettres();
-        while (simulation.EstTermine() == false)//Tant que toutes les lettres ne sont pas envoyées
-        {   
-            simulation.PasserHeure();
+            //----Méthode AfficherBilanFinal----//
+            //Auteur : Rémi 
+            //Description : Affiche le bilan de la simulation lorsqu'on la quitte.
+            public void AfficherBilanFinal()
+            {
+                Console.Clear();
+                Console.WriteLine("\n=============================================================================");
+                Console.WriteLine($"∣∣-------------------------Bilan Final de la Simulation--------------------∣∣");
+                Console.WriteLine("=============================================================================");
+                Console.WriteLine("================================== Entrepôts ================================");
+                Console.WriteLine($"∣∣ Il y a actuellement {EntrepotAfrique.StockJouet.Taille} Jouet(s) dans l'entrepôt d'Afrique.               ∣∣");//Affiche le nombre de jouets en Afrique
+                Console.WriteLine($"∣∣ Il y a actuellement {EntrepotAmerique.StockJouet.Taille} Jouet(s) dans l'entrepôt d'Amérique.              ∣∣");//Affiche le nombre de jouets en Amérique
+                Console.WriteLine($"∣∣ Il y a actuellement {EntrepotAsie.StockJouet.Taille} Jouet(s) dans l'entrepôt d'Asie.                  ∣∣");//Affiche le nombre de jouets en Asie
+                Console.WriteLine($"∣∣ Il y a actuellement {EntrepotEurope.StockJouet.Taille} Jouet(s) dans l'entrepôt d'Europe.                ∣∣");//Affiche le nombre de jouets en Europe
+                Console.WriteLine($"∣∣ Il y a actuellement {EntrepotOceanie.StockJouet.Taille} Jouet(s) dans l'entrepôt d'Océanie.               ∣∣");//Affiche le nombre de jouets en Océanie
+                Console.WriteLine("=================================== Dépenses ================================");
+                Console.WriteLine($"∣∣ Somme totale des pièces dues aux travailleurs : {this.CoutTotal} euro(s)           ∣∣");//Affiche le nombre de pièces dépensées durant toute la simulation
+                Console.WriteLine($"∣∣ Somme moyenne des pièces dues aux travailleurs par heure : {this.CoutTotal / this.NBHeure} euro(s)  ∣∣");//Affiche le nombre de pièces dépensées en moyenne durant une heure de simulation
+                Console.WriteLine("============================= Nombre(s) de Jour(s) ==========================");
+                Console.WriteLine($"∣∣ Durée de la simulation : {this.NBJour} jours                                        ∣∣");//Affiche le nombre de jours passés dans la simulation
+                Console.WriteLine("==================================== Fin ====================================");
+                Console.WriteLine();
+                Console.WriteLine("Appuyez sur une touche pour passer le bilan final et finir la simulation...");
+                string? temp = Console.ReadLine();
+                Console.Clear();
+            }
+
+
+            //----Méthode GestionLutins----//
+            //Auteur : Tancrède
+            //Description : Fonction qui affiche combien de lutins sont au repos, en attente ou en train de travailler
+            public void GestionLutins()
+            {
+                int nbTravail = 0;
+                int nbRepos = 0;
+                int nbAttente = 0;
+
+                //Nombres de Lutins en train de travailler, au repos et en attente
+                for (int i = 0; i < ParamSimulation.NBLutins ; i++)
+                {
+                    Lutin l = FileLutins.Defile();
+                    if (l.Statut == EtatTravail.Travail){nbTravail++;}
+                    else if (l.Statut == EtatTravail.Attente){nbAttente++;}
+                    else if(l.Statut == EtatTravail.Repos){nbRepos++;}
+                    FileLutins.Enfile(l);
+                }
+                Console.Clear();
+                Console.WriteLine("===================================================");
+                Console.WriteLine("∣∣                 GESTION DES LUTINS            ∣∣");
+                Console.WriteLine("===================================================");
+                Console.WriteLine($"∣∣  Il y a {nbTravail} lutins en train de travailler       ∣∣");
+                Console.WriteLine($"∣∣  Il y a {nbAttente} lutins en attente                   ∣∣");
+                Console.WriteLine($"∣∣  Il y a {nbRepos} lutins au repos                     ∣∣");
+                Console.WriteLine("===================================================");
+                //Options et traitement des choix
+                Console.WriteLine("∣∣            Que voulez vous faire ?            ∣∣");
+                Console.WriteLine("===================================================");
+                Console.WriteLine("∣∣ -> 1 : Envoyer des lutins au repos            ∣∣");
+                Console.WriteLine("∣∣ -> 2 : Envoyer des lutins au travail          ∣∣");
+                Console.WriteLine("∣∣ -> retour : Retourner au menu précédent       ∣∣");
+                Console.WriteLine("===================================================");
+                string? repString = Console.ReadLine();
+                int rep ;
+                //Tant que l'on ne veut pas retourner au menu d'avant
+                while (repString != "retour")
+                {
+                    //Si on a fait un retour en arrière on réaffiche tout
+                    if (repString == "back")
+                    {
+                        Console.Clear();
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine("∣∣                 GESTION DES LUTINS            ∣∣");
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine($"∣∣  Il y a {nbTravail} lutins en train de travailler       ∣∣");
+                        Console.WriteLine($"∣∣  Il y a {nbAttente} lutins en attente                   ∣∣");
+                        Console.WriteLine($"∣∣  Il y a {nbRepos} lutins au repos                     ∣∣");
+                        Console.WriteLine("===================================================");
+                        //Options et traitement des choix
+                        Console.WriteLine("∣∣            Que voulez vous faire ?            ∣∣");
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine("∣∣ -> 1 : Envoyer des lutins au repos            ∣∣");
+                        Console.WriteLine("∣∣ -> 2 : Envoyer des lutins au travail          ∣∣");
+                        Console.WriteLine("∣∣ -> retour : Retourner au menu précédent       ∣∣");
+                        Console.WriteLine("===================================================");
+                        repString = Console.ReadLine();
+
+                    }
+                    //Si la réponse n'est pas valide, on fait resaisir la valeur
+                    if ((int.TryParse(repString, out rep) == false || rep < 1 || rep > 3) && repString != "retour")
+                    {
+                        Console.WriteLine("** /!\\ Veuillez rentrer un entier valide (entre 1 et 3)");
+                        repString = Console.ReadLine();
+                    }
+                    //-------------------------------------------
+                    //Si on choisit de mettre des lutins au repos
+                    else if(rep == 1)
+                    {
+                        Console.Clear();
+                        //Si on peut mettre des Lutins au repos (çàd s'il y en a en attente)
+                        if(nbAttente > 0)
+                        {
+                            Console.WriteLine($"Combien de lutins voulez vous envoyer au repos (vous pouvez en envoyer jusqu'à {nbAttente})");
+                            Console.WriteLine($"    ('retour' pour annuler)");
+                            repString = Console.ReadLine();
+
+                            while (repString != "retour")//Tant que l'utilisateur ne veut pas quitter ce menu
+                            {
+                                //Si le nombre de lutins est invalide (pas dans l'interval 0 < x <= nbAttente)
+                                if(int.TryParse(repString, out rep) == false || rep < 1 || rep > nbAttente)
+                                {
+                                    Console.WriteLine($"** /!\\ Veuillez rentrer un entier valide (entre 1 et {nbAttente})");
+                                    repString = Console.ReadLine();
+                                }
+                                else//Sinon on fait le traitement demandé
+                                {
+                                    for(int i = 0; i < ParamSimulation.NBLutins ; i++)
+                                    {
+                                        Lutin l = FileLutins.Defile();
+                                        int count = rep;
+                                        //Si on doit encore mettre des lutins au repos et que le lutin est en attente
+                                        if(l.Statut == EtatTravail.Attente && count > 0)
+                                        {
+                                            l.Statut = EtatTravail.Repos;
+                                            count--;//On a un Lutin de moins à mettre au repos
+                                        }
+                                        FileLutins.Enfile(l);
+                                    }
+                                    //On met à jour les différents comptes
+                                    nbAttente = nbAttente - rep;
+                                    nbRepos = nbRepos + rep;
+                                    tempsReposLutins = 12;
+                                    repString = "retour";
+                                }
+                            }
+                        }
+                        //Sinon, on prévient l'utilisateur
+                        else
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine("** /!\\ Il n'y a pas de lutins en attente à mettre au repos, veuillez faire un autre choix");
+                            Console.WriteLine();
+                            Console.WriteLine("Veuillez appuyer sur une touche pour continuer...");
+                            string? retour = Console.ReadLine();
+                        }
+                        Console.Clear();
+                        repString = "back";
+                    }
+                    //---------------------------------------------
+                    //Si on choisit de mettre des lutins au travail
+                    else if (rep == 2)
+                    {
+                        Console.Clear();
+                        //Si on peut mettre des Lutins au travail (çàd s'il y en a en attente)
+                        if(nbRepos > 0 && tempsReposLutins <= 0)
+                        {
+                            Console.WriteLine($"Combien de lutins voulez vous envoyer au travail (vous pouvez en envoyer jusqu'à {nbRepos})");
+                            Console.WriteLine($"    ('retour' pour annuler)");
+                            repString = Console.ReadLine();
+
+                            while (repString != "retour")//Tant que l'utilisateur ne veut pas quitter ce menu
+                            {
+                                //Si le nombre de lutins est invalide (pas dans l'interval 0 < x <= nbRepos)
+                                if(int.TryParse(repString, out rep) == false || rep < 1 || rep > nbRepos)
+                                {
+                                    Console.WriteLine($"** /!\\ Veuillez rentrer un entier valide (entre 1 et {nbRepos})");
+                                    repString = Console.ReadLine();
+                                }
+                                else//Sinon on fait le traitement demandé
+                                {
+                                    for(int i = 0; i < ParamSimulation.NBLutins ; i++)
+                                    {
+                                        Lutin l = FileLutins.Defile();
+                                        int count = rep;
+                                        //Si on doit encore mettre des lutins au travail et que le lutin est au repos
+                                        if(l.Statut == EtatTravail.Repos && count > 0)
+                                        {
+                                            l.Statut = EtatTravail.Attente;//on le met en attente car il n'est pas encore en train de travailler
+                                            count--;//On a un Lutin de moins à mettre au travail
+                                        }
+                                        FileLutins.Enfile(l);
+                                    }
+                                    //On met à jour les différents comptes
+                                    nbAttente = nbAttente + rep;
+                                    nbRepos = nbRepos - rep;
+                                    repString = "retour";
+                                }
+                            }
+                        }
+                        //Sinon, on prévient l'utilisateur
+                        else if (tempsReposLutins > 0)
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine($"** /!\\ Les lutins sont encore au repos pour {tempsReposLutins} heure(s), veuillez faire un autre choix");
+                        }
+                        else
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine("** /!\\ Il n'y a pas de lutins au repos, veuillez faire un autre choix");
+                            Console.WriteLine();
+                            Console.WriteLine("Veuillez appuyer sur une touche pour continuer...");
+                            string? retour = Console.ReadLine();
+                        }
+                        Console.Clear();
+                        repString = "back";
+                    }
+                }
+                    
+            }
+
+            //----Méthode GestionNains----//
+            //Auteur : Tancrède
+            //Description : Fonction qui affiche combien de nains sont au repos, en attente ou en train de travailler
+            public void GestionNains()
+            {                
+                //Nombres de nains en train de travailler, au repos et en attente
+                int nbTravail = 0;
+                int nbRepos = 0;
+                int nbAttente = 0;
+
+                for (int i = 0; i < ParamSimulation.NBNains ; i++)
+                {
+                    Nain n = FileNains.Defile();
+                    if (n.Statut == EtatTravail.Travail){nbTravail++;}
+                    else if (n.Statut == EtatTravail.Attente){nbAttente++;}
+                    else if(n.Statut == EtatTravail.Repos){nbRepos++;}
+                    FileNains.Enfile(n);
+                }
+                Console.Clear();
+                Console.WriteLine("===================================================");
+                Console.WriteLine("∣∣                 GESTION DES Nains             ∣∣");
+                Console.WriteLine("===================================================");
+                Console.WriteLine($"∣∣  Il y a {nbTravail} nains en train de travailler        ∣∣");
+                Console.WriteLine($"∣∣  Il y a {nbAttente} nains en attente                    ∣∣");
+                Console.WriteLine($"∣∣  Il y a {nbRepos} nains au repos                      ∣∣");
+                Console.WriteLine("===================================================");
+                //Options et traitement des choix
+                Console.WriteLine("∣∣            Que voulez vous faire ?            ∣∣");
+                Console.WriteLine("===================================================");
+                Console.WriteLine("∣∣ -> 1 : Envoyer des nains au repos             ∣∣");
+                Console.WriteLine("∣∣ -> 2 : Envoyer des nains au travail           ∣∣");
+                Console.WriteLine("∣∣ -> 'retour' : Retourner au menu précédent     ∣∣");
+                Console.WriteLine("===================================================");
+
+                string? repString = Console.ReadLine();
+                int rep ;
+                //Tant que l'on ne veut pas retourner au menu d'avant
+                while (repString != "retour")
+                {
+                    //Si on a fait un retour en arrière on réaffiche tout
+                    if (repString == "back")
+                    {
+                        //Affichage des infos
+                        Console.Clear();
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine("∣∣                 GESTION DES Nains             ∣∣");
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine($"∣∣  Il y a {nbTravail} nains en train de travailler        ∣∣");
+                        Console.WriteLine($"∣∣  Il y a {nbAttente} nains en attente                    ∣∣");
+                        Console.WriteLine($"∣∣  Il y a {nbRepos} nains au repos                      ∣∣");
+                        Console.WriteLine("===================================================");
+                        //Options et traitement des choix
+                        Console.WriteLine("∣∣            Que voulez vous faire ?            ∣∣");
+                        Console.WriteLine("===================================================");
+                        Console.WriteLine("∣∣ -> 1 : Envoyer des nains au repos             ∣∣");
+                        Console.WriteLine("∣∣ -> 2 : Envoyer des nains au travail           ∣∣");
+                        Console.WriteLine("∣∣ -> 'retour' : Retourner au menu précédent     ∣∣");
+                        Console.WriteLine("===================================================");
+                        repString = Console.ReadLine();
+
+                    }
+                    //Si la réponse n'est pas valide, on fait resaisir la valeur
+                    if ((int.TryParse(repString, out rep) == false || rep < 1 || rep > 3) && repString != "retour")
+                    {
+                        Console.WriteLine("** /!\\ Veuillez rentrer un entier valide (entre 1 et 3)");
+                        repString = Console.ReadLine();
+                    }
+                    //-------------------------------------------
+                    //Si on choisit de mettre des nains au repos
+                    else if(rep == 1)
+                    {
+                        //Si on peut mettre des nains au repos (çàd s'il y en a en attente)
+                        if(nbAttente > 0)
+                        {
+                            Console.Clear();
+                            Console.WriteLine($"Combien de nains voulez vous envoyer au repos (vous pouvez en envoyer jusqu'à {nbAttente})");
+                            Console.WriteLine($"    ('retour' pour annuler)");
+                            repString = Console.ReadLine();
+
+                            while (repString != "retour")//Tant que l'utilisateur ne veut pas quitter ce menu
+                            {
+                                //Si le nombre de nains est invalide (pas dans l'interval 0 < x <= nbAttente)
+                                if(int.TryParse(repString, out rep) == false || rep < 1 || rep > nbAttente)
+                                {
+                                    Console.WriteLine($"** /!\\ Veuillez rentrer un entier valide (entre 1 et {nbAttente})");
+                                    repString = Console.ReadLine();
+                                }
+                                else//Sinon on fait le traitement demandé
+                                {
+                                    for(int i = 0; i < ParamSimulation.NBNains ; i++)
+                                    {
+                                        Nain n = FileNains.Defile();
+                                        int count = rep;
+                                        //Si on doit encore mettre des nains au repos et que le nains est en attente
+                                        if(n.Statut == EtatTravail.Attente && count > 0)
+                                        {
+                                            n.Statut = EtatTravail.Repos;
+                                            count--;//On a un nains de moins à mettre au repos
+                                        }
+                                        FileNains.Enfile(n);
+                                    }
+                                    //On met à jour les différents comptes
+                                    nbAttente = nbAttente - rep;
+                                    nbRepos = nbRepos + rep;
+                                    tempsReposNains = 24;
+                                    repString = "retour";
+                                }
+                            }
+                        }
+                        //Sinon, on prévient l'utilisateur
+                        else
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine("** /!\\ Il n'y a pas de nains en attente à mettre au repos, veuillez faire un autre choix");
+                            Console.WriteLine();
+                            Console.WriteLine("Veuillez appuyer sur une touche pour continuer...");
+                            string? retour = Console.ReadLine();
+                        }
+                        Console.Clear();
+                        repString = "back";
+                    }
+                    //---------------------------------------------
+                    //Si on choisit de mettre des nains au travail
+                    else if (rep == 2)
+                    {
+                        Console.Clear();
+                        //Si on peut mettre des nains au travail (çàd s'il y en a en attente)
+                        if(nbRepos > 0 && tempsReposNains <= 0)
+                        {
+                            Console.WriteLine($"Combien de nains voulez vous envoyer au travail (vous pouvez en envoyer jusqu'à {nbRepos})");
+                            Console.WriteLine($"    ('retour' pour annuler)");
+                            repString = Console.ReadLine();
+
+                            while (repString != "retour")//Tant que l'utilisateur ne veut pas quitter ce menu
+                            {
+                                //Si le nombre de lutins est invalide (pas dans l'interval 0 < x <= nbRepos)
+                                if(int.TryParse(repString, out rep) == false || rep < 1 || rep > nbRepos)
+                                {
+                                    Console.WriteLine($"** /!\\ Veuillez rentrer un entier valide (entre 1 et {nbRepos})");
+                                    repString = Console.ReadLine();
+                                }
+                                else//Sinon on fait le traitement demandé
+                                {
+                                    for(int i = 0; i < ParamSimulation.NBNains ; i++)
+                                    {
+                                        Nain n = FileNains.Defile();
+                                        int count = rep;
+                                        //Si on doit encore mettre des nains au travail et que le nains est au repos
+                                        if(n.Statut == EtatTravail.Repos && count > 0)
+                                        {
+                                            n.Statut = EtatTravail.Attente;//on le met en attente car il n'est pas encore en train de travailler
+                                            count--;//On a un nains de moins à mettre au travail
+                                        }
+                                        FileNains.Enfile(n);
+                                    }
+                                    //On met à jour les différents comptes
+                                    nbAttente = nbAttente + rep;
+                                    nbRepos = nbRepos - rep;
+                                    repString = "retour";
+                                }
+                            }
+                        }
+                        //Sinon, on prévient l'utilisateur
+                        else if (tempsReposLutins > 0)
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine($"** /!\\ Les nains sont encore au repos pour {tempsReposNains} heure(s), veuillez faire un autre choix");
+                        }
+                        else
+                        {
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+                            Console.WriteLine("** /!\\ Il n'y a pas de nains au repos, veuillez faire un autre choix");
+                            Console.WriteLine();
+                            Console.WriteLine("Veuillez appuyer sur une touche pour continuer...");
+                            string? retour = Console.ReadLine();
+                        }
+                        Console.Clear();
+                        repString = "back";
+                    }
+                }
+                    
+            }
         }
-        simulation.EntrepotAfrique.EvaluationEntrepot();
-        simulation.EntrepotAmerique.EvaluationEntrepot();
-        simulation.EntrepotAsie.EvaluationEntrepot();
-        simulation.EntrepotEurope.EvaluationEntrepot();
-        simulation.EntrepotOceanie.EvaluationEntrepot();     
+        //----------------------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------Méthodes--------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+
+        //Auteur : Rémi
+        //Fonction/Class : DemandeInt
+        //Paramètres : Aucun
+        //Renvoie : Int
+        //Utilité : La fonction sert à verifier si ce que l'utilisateur à rentrer est bien un int, et s'il est positif.
+        //          Si ce n'est pas le cas, la fonction lui envoie un message d'erreur et lui demande une nouvelle valeur.
+        public static int DemandeInt()
+        {
+            bool condition = false;
+            int Valeur;
+            do
+            {
+                string saisie = Console.ReadLine();
+                condition = int.TryParse(saisie, out Valeur);
+                if (!condition || int.Parse(saisie) < 1)
+                {
+                    Console.WriteLine("Erreur : veuillez entrer un entier valide !");
+                    condition = false;
+                }
+                else
+                {
+                    Valeur = int.Parse(saisie);
+                }
+            } while (!condition);
+            Console.Clear();
+            return Valeur;
+        }
+        
+        //---------------------------------------------Fonction AgeToJouet---------------------------------------------// 
+        //Auteur : Rémi
+        //Fonction/Class : AgetoJouet
+        //Paramètres : age (int)
+        //Renvoie : Jouet
+        //Utilité : La fonction renvoie le type de jouet adapté en fonction de l'âge de l'enfant.
+        //0 et 18 ans
+        public static Jouet AgeToJouet(int age)
+        {
+            // Test si l'âge entré par l'utilisateur est dans compris entre 0 et 18 ans les deux compris, sinon renvoie un erreur.
+            if(0 <= age && age <= 2){return Jouet.Nounours;}
+            else if(3 <= age && age <= 5){return Jouet.Tricycle;}
+            else if(6 <= age && age <= 10){return Jouet.Jumelles;}
+            else if(11 <= age && age <= 15){return Jouet.Abonnement;}
+            else if(16 <= age && age <= 18) {return Jouet.Ordinateur;}
+            else {throw new Exception("L'âge doit être compris entre 0 et 18 ans.");}
+        }
+
+        //---------------------------------------------Fonction RandomContinent---------------------------------------------// 
+        //Auteur : Rémi
+        //Fonction/Class : RandomContinent
+        //Paramètres : nbr (int)
+        //Renvoie : Continents
+        //Utilité : La fonction renvoie un continent en fonction du numero au hasard qui est en paramètre.
+        public static Continents RandomContinent(int nbr)
+        {
+            if(nbr < 0 || nbr > 4){throw new Exception("Le numéro n'est pas convenable");}
+            else if(nbr == 0){return Continents.Afrique;}
+            else if(nbr == 1){return Continents.Amerique;}
+            else if(nbr == 2){return Continents.Asie;}
+            else if(nbr == 3){return Continents.Europe;}
+            else{return Continents.Oceanie;}
+        }
+
+        //---------------------------------------------Fonction CreerLettre---------------------------------------------//        
+        //Auteur : Tancrède, Rémi
+        //Description : Fonction qui génére une lettre aléatoire et la retourne
+        public static Lettre CreerLettre()
+        {
+            Random random = new Random(); // Initialise random
+            // Initialise une liste des prénoms (les prénoms les plus donnés en france en 2024)
+            string[] ListePrenoms = {"Gabriel", "Léo", "Maël", "Noah", "Jules", "Adam", "Louis", "Jade", "Louise", "Lola", "Emma", "Lou", "Tibo"}; 
+            // Initialise une liste des noms (noms aléatoire)
+            string[] ListeNoms = {"Dupont", "Martin", "Inshape", "Papin", "Bernard", "Robert", "Leroy", "Lefèvre", "Millot", "Girard", "Moreau", "Simon", "Kirk", "Durand", "Dubois"}; 
+            // Initialise une liste d'adresse (adresses aléatoire)
+            string[] ListeAdresse = { "12 Rue de la République, 75001 Paris", "45 Avenue Jean Jaurès, 31000 Toulouse", "78 Boulevard de la Liberté, 69003 Lyon", "33 Rue des Fleurs, 13006 Marseille", "15 Place de la Comédie, 34000 Montpellier", "22 Rue du Commerce, 44000 Nantes", "56 Avenue des Champs-Élysées, 75008 Paris", "9 Rue de la Gare, 67000 Strasbourg", "101 Boulevard de la Mer, 06200 Nice", "8 Rue du Marché, 59800 Lille" };
+            string prenom = ListePrenoms[random.Next(ListePrenoms.Length)]; // Prend un prénoms aléatoire dans la liste des prénoms
+            string nom = ListeNoms[random.Next(ListeNoms.Length)];// Prend un nom aléatoire dans la liste des nom
+            Continents continent = RandomContinent(random.Next(5));// Prend un nombre aléatoire et en fait un Continent
+            int age = random.Next(19); // Prend un âge aléatoire entre 0 et 18 ans et le transforme en jouet
+            string adresse = ListeAdresse[random.Next(ListeAdresse.Length)];// Prend une adresse aléatoire dans la liste des adresses
+            Lettre lettreAléatoire = new Lettre(age,nom, prenom, continent, adresse); // Créer la lettre avec les valeurs aléatoires plus hauts
+            //On retourne la lettre
+            return lettreAléatoire;
+        }
+
+
+        //----------------------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+        //------------------------------------------------------ Main ----------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+        //----------------------------------------------------------------------------------------------------------------------//
+        public static void Main()
+        {
+            bool ApplicationOuverte = true;
+            while(ApplicationOuverte)
+            {
+                Simulation simulation = new Simulation(); 
+                if(simulation.VeutArrêter == true)
+                {
+                    break; // On arrête tout le code car l'utilisateur a entré QUITTER plutôt que LANCEMENT
+                }
+                simulation.CreationTravailleurs();
+                simulation.CreationLettres();
+                while (simulation.EstTermine() == false && simulation.VeutRelancer == false && simulation.VeutArrêter == false)//Tant que toutes les lettres ne sont pas envoyées, que l'utilisateur ne veut pas relancer la simulation ou qu'il ne veut pas l'arrêter
+                {   
+                    simulation.Lancer();
+                }
+                if(simulation.VeutRelancer == true) //L'utilisateur veut relancer une nouvelle simulation, donc on retire l'ancien affichage.
+                {
+                    Console.Clear();
+                }
+                else
+                {
+                    ApplicationOuverte = false; // Si l'utilisateur veut arrêter la simulation pendant son exécution
+                }
+            }
+        }
     }
 
-}
 }
