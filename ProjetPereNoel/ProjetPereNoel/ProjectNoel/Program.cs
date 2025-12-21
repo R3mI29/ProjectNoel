@@ -667,7 +667,7 @@ namespace ProjectNoel
             public Param ParamSimulation;
 
             //Variable aléatoire de la simulation
-            Random Randomizator = new Random(); // Initialise random
+            Random Randomizator; // Initialise random
 
             //Pile de lettres sur le bureau du Père Noël
             public Pile<Lettre> LettresBureauPereNoel {get; set;}
@@ -719,8 +719,8 @@ namespace ProjectNoel
             public int NBHeure {get; set;}
 
             //Temps de repos des nains et des lutins
-            public int tempsReposLutins;
-            public int tempsReposNains;
+            public int TempsReposLutins;
+            public int TempsReposNains;
 
 
             //Constructeur
@@ -782,7 +782,7 @@ namespace ProjectNoel
                     EntrepotEurope = new Entrepot(Continents.Europe);
                     EntrepotOceanie = new Entrepot(Continents.Oceanie);
 
-
+                    Randomizator = new Random();
                     
                 }
             }
@@ -927,7 +927,7 @@ namespace ProjectNoel
                 }
 
                 //--Gestion Elfes
-                bool finPrepaCadeau = FinPreparationCadeau();
+                bool finPrepaCadeau = FinPreparationCadeaux();
                 for(int i = 0; i < 5; i++)
                 {
                     Pile<Lettre> CadeauxAutreContinent = new Pile<Lettre>{}; // Créer une pile de cadeaux pour les cadeaux qui n'ont pas encore été récupérés par l'elfe de leur continent.
@@ -957,11 +957,11 @@ namespace ProjectNoel
                 }
             }
 
-            //----Méthode FinPreparationCadeau----//
+            //----Méthode FinPreparationCadeaux----//
             //Auteur : Tancrède
             //Description : Vérifie que toutes les lettres ont étés traitées et que tous les cadeaux ont bien étés préparés et
             //Qu'ils sont donc au moins dans la file d'attente de leur elfe respectif
-            public bool FinPreparationCadeau()
+            public bool FinPreparationCadeaux()
             {
                 //Vérifie si aucun des lutins ne sont en train de travailler
                 for(int i = 0 ; i < ParamSimulation.NBLutins ; i++)
@@ -1018,7 +1018,7 @@ namespace ProjectNoel
                 }
 
                 //Vérifie si tous les cadeaux ont bien été traités
-                return FinPreparationCadeau();
+                return FinPreparationCadeaux();
             }
             
             //----Méthode LancerSimulation----//
@@ -1367,7 +1367,7 @@ namespace ProjectNoel
                                     //On met à jour les différents comptes
                                     nbAttente = nbAttente - rep;
                                     nbRepos = nbRepos + rep;
-                                    tempsReposLutins = 12;
+                                    TempsReposLutins = 12;
                                     repString = "retour";
                                 }
                             }
@@ -1390,7 +1390,7 @@ namespace ProjectNoel
                     {
                         Console.Clear();
                         //Si on peut mettre des Lutins au travail (çàd s'il y en a en attente)
-                        if(nbRepos > 0 && tempsReposLutins <= 0)
+                        if(nbRepos > 0 && TempsReposLutins <= 0)
                         {
                             Console.WriteLine($"Combien de lutins voulez vous envoyer au travail (vous pouvez en envoyer jusqu'à {nbRepos})");
                             Console.WriteLine($"    ('retour' pour annuler)");
@@ -1426,10 +1426,10 @@ namespace ProjectNoel
                             }
                         }
                         //Sinon, on prévient l'utilisateur
-                        else if (tempsReposLutins > 0)
+                        else if (TempsReposLutins > 0)
                         {
                             Console.WriteLine("---------------------------------------------------------------------------------------------------------");
-                            Console.WriteLine($"** /!\\ Les lutins sont encore au repos pour {tempsReposLutins} heure(s), veuillez faire un autre choix");
+                            Console.WriteLine($"** /!\\ Les lutins sont encore au repos pour {TempsReposLutins} heure(s), veuillez faire un autre choix");
                         }
                         else
                         {
@@ -1466,7 +1466,7 @@ namespace ProjectNoel
                 }
                 Console.Clear();
                 Console.WriteLine("===================================================");
-                Console.WriteLine("∣∣                 GESTION DES Nains             ∣∣");
+                Console.WriteLine("∣∣                 GESTION DES NAINS             ∣∣");
                 Console.WriteLine("===================================================");
                 Console.WriteLine($"∣∣  Il y a {nbTravail} nains en train de travailler        ∣∣");
                 Console.WriteLine($"∣∣  Il y a {nbAttente} nains en attente                    ∣∣");
@@ -1491,7 +1491,7 @@ namespace ProjectNoel
                         //Affichage des infos
                         Console.Clear();
                         Console.WriteLine("===================================================");
-                        Console.WriteLine("∣∣                 GESTION DES Nains             ∣∣");
+                        Console.WriteLine("∣∣                 GESTION DES NAINS             ∣∣");
                         Console.WriteLine("===================================================");
                         Console.WriteLine($"∣∣  Il y a {nbTravail} nains en train de travailler        ∣∣");
                         Console.WriteLine($"∣∣  Il y a {nbAttente} nains en attente                    ∣∣");
@@ -1550,7 +1550,7 @@ namespace ProjectNoel
                                     //On met à jour les différents comptes
                                     nbAttente = nbAttente - rep;
                                     nbRepos = nbRepos + rep;
-                                    tempsReposNains = 24;
+                                    TempsReposNains = 24;
                                     repString = "retour";
                                 }
                             }
@@ -1573,7 +1573,7 @@ namespace ProjectNoel
                     {
                         Console.Clear();
                         //Si on peut mettre des nains au travail (çàd s'il y en a en attente)
-                        if(nbRepos > 0 && tempsReposNains <= 0)
+                        if(nbRepos > 0 && TempsReposNains <= 0)
                         {
                             Console.WriteLine($"Combien de nains voulez vous envoyer au travail (vous pouvez en envoyer jusqu'à {nbRepos})");
                             Console.WriteLine($"    ('retour' pour annuler)");
@@ -1609,10 +1609,10 @@ namespace ProjectNoel
                             }
                         }
                         //Sinon, on prévient l'utilisateur
-                        else if (tempsReposLutins > 0)
+                        else if (TempsReposLutins > 0)
                         {
                             Console.WriteLine("---------------------------------------------------------------------------------------------------------");
-                            Console.WriteLine($"** /!\\ Les nains sont encore au repos pour {tempsReposNains} heure(s), veuillez faire un autre choix");
+                            Console.WriteLine($"** /!\\ Les nains sont encore au repos pour {TempsReposNains} heure(s), veuillez faire un autre choix");
                         }
                         else
                         {
