@@ -1727,7 +1727,6 @@ namespace ProjectNoel
         //----------------------------------------------------------------------------------------------------------------------//
         public static void Main()
         {
-            /*
             bool ApplicationOuverte = true;
             while(ApplicationOuverte)
             {
@@ -1751,21 +1750,8 @@ namespace ProjectNoel
                     ApplicationOuverte = false; // Si l'utilisateur veut arrêter la simulation pendant son exécution
                 }
             }
-            */
-
-            File<int> fileTest = new File<int> {};//Création d'une file vide
-            Console.WriteLine(fileTest.EstVide());//Affiche True
-            fileTest.Enfile(1);
-            fileTest.Enfile(2);
-            fileTest.Affiche();//Affiche    <-- 1 | 2 | File
-            Console.WriteLine(fileTest.Defile());//Affiche 1
-            fileTest.Affiche();//Affiche    <-- 2 | File
-            fileTest.Vide();//Vide la file
-            fileTest.EstVide(); //Renvoie
-            fileTest.Affiche(); //Affiche que la file est vide
-
-
         }
     }
 
 }
+
