@@ -675,9 +675,6 @@ namespace ProjectNoel
             //File des jouets fabriqués par les lutins mais en attente des nains
             public File<Lettre> FileAttenteNain {get; set;}
 
-            //File d'attente des lettres envoyées aux Lutins chaque heure
-            public File<Lettre> FileAttenteLutin {get; set;}
-
 
             //Jouets stockés dans l'entrepot d'Asie
             public Entrepot EntrepotAsie {get; set;}
@@ -699,6 +696,9 @@ namespace ProjectNoel
 
             //File des Elfes
             public File<Elfe> FileElfes ;
+
+            //File des Lutins
+            public File<Lutin> FileLutins;
 
             //Coût des travailleurs
             public double CoutHeure;
@@ -979,7 +979,6 @@ namespace ProjectNoel
                     if (n.Statut == EtatTravail.Travail){return false;}
                 }
                 return  ParamSimulation.NBEnfants <= 0 &&//Reste-t-il des lettres à traiter
-                        FileAttenteLutin.EstVide() && //Y a-t-il des lettres en attente pour les lutins
                         LettresBureauPereNoel.EstVide() && //Y a-t-il des lettres en attente sur le bureau du père noël
                         FileAttenteNain.EstVide();//Y a-t-il des lettres en attente pour les nains
             }
@@ -1755,4 +1754,3 @@ namespace ProjectNoel
     }
 
 }
-
