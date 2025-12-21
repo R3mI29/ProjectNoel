@@ -15,8 +15,8 @@ namespace ProjectNoel
         //----------------------------------------------------------------------------------------------------------------------//
         
         //Auteur : Tancrède
-        //Type Jouet :
-        //Type représentant les différents jouets qu'un enfant peut recevoir
+        //Type Jouet
+        //Description : Type représentant les différents jouets qu'un enfant peut recevoir
         //La valeur de chaque élément du type représente le nombre d'heures
         //nécessaires à sa fabrication.
         public enum Jouet
@@ -113,8 +113,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe File---------------------------------------------//
         //Auteur : Tancrède 
-        //Description : Classe représentant une file avec des listes chaînées.
-        //Elle contient les méthodes : Enfile, Defile et EstVide
+        //Description : Classe représentant une file à partir d'une liste chaînée.
         public class File<T>
         {
             internal ListeChainee<T> Liste {get; set;}// Liste qui représente la file
@@ -176,7 +175,7 @@ namespace ProjectNoel
                 {
                         
                     File<T> fileTemp = new File<T> {};
-                    Console.Write("<--");
+                    Console.Write("<--");//Sens de défilement
                     while (this.EstVide() != true)
                     {
                         T valTemp = this.Defile();
@@ -206,9 +205,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Pile---------------------------------------------//        
         // //Auteur : Tancrède 
-        //Description : Classe représentant une pile avec des listes chaînées.
-        //Elle contient les méthodes : Empile, Depile et EstVide
-
+        //Description : Classe représentant une pile à partir d'une liste chaînée.
         public class Pile<T>
         {
             public ListeChainee<T> Liste {get; set;}//Liste représentant la pile
@@ -259,14 +256,14 @@ namespace ProjectNoel
 
             //----Méthode Affiche----//
             //Auteur : Tancrède
-            //Description : affiche le contenu de la pile et le sens dans lequel elle va.
+            //Description : affiche le contenu de la pile et le sens de dépilement.
             public void Affiche()
             {
                 if (this.EstVide()){Console.WriteLine("La pile est vide");}
                 else
                 {
                     Pile<T> pileTemp = new Pile<T> {};
-                    Console.Write("<--");
+                    Console.Write("<--");//sens de dépilement
                     while (this.EstVide() != true)
                     {
                         T valTemp = this.Depile();
@@ -336,7 +333,7 @@ namespace ProjectNoel
             
             public Lutin()
             {
-                Statut = EtatTravail.Attente;//Le lutin est par defaut en attente
+                Statut = EtatTravail.Attente;//Le lutin est par défaut en attente
                 HeureRestantes = 0;
                 LettreEnCours = null;
             }
@@ -371,7 +368,7 @@ namespace ProjectNoel
                 //Si la lettre est terminé
                 if(this.HeureRestantes <= 0)
                 {
-                    //Pour pouvoir mettre l'attribut LettreEnCours comme nul
+                    //Pour pouvoir mettre l'attribut LettreEnCours comme null
                     Lettre LettreTerminee = this.LettreEnCours;
 
                     this.Statut = EtatTravail.Attente;
@@ -389,7 +386,7 @@ namespace ProjectNoel
 
         //---------------------------------------------Classe Nain---------------------------------------------//
         // Auteur : Rémi
-        // Utilité : La classe Nain sert à créer les nains, ils sont ceux qui emballent les cadeau pour les donnés aux elfes.
+        // Utilité : La classe Nain sert à créer les nains, ils sont ceux qui emballent les cadeaux pour les donner aux elfes.
         public class Nain
         {
             public EtatTravail Statut {get; set;}
@@ -422,7 +419,7 @@ namespace ProjectNoel
             //Auteur : Rémi
             //Fonction/Class : Emballage
             //Renvoie : Lettre
-            //Utilité : La fonction renvoie les lettres finies et garde le nain occupé aussi longtemps que necessaire.
+            //Utilité : La fonction renvoie les lettres finies et garde le nain occupé aussi longtemps que nécessaire.
             public Lettre Emballage()
             {
                 if(Statut == EtatTravail.Travail && LettreActuelle != null)
@@ -663,7 +660,7 @@ namespace ProjectNoel
         
         //---------------------------------------------Classe Simulation---------------------------------------------//
         // Auteur : Tancrède et Rémi
-        // Utilité : La classe Simulation sert à lancer le logiciel et à faire marcher toutes les classes et fonctions ensemble.
+        // Description : Fonction qui permet de gérer une simulation. Elle s'occupe de l'initialisation des variables, de la gestion des travailleurs et du menu utilisateur.
         public class Simulation
         {
             //Paramètres de la simulation
@@ -699,9 +696,6 @@ namespace ProjectNoel
 
             //File des Nains
             public File<Nain> FileNains {get; set;}
-
-            //File des Lutins
-            public File<Lutin> FileLutins {get; set;}
 
             //File des Elfes
             public File<Elfe> FileElfes ;
@@ -781,8 +775,6 @@ namespace ProjectNoel
                     FileElfes = new File<Elfe> {};
 
                     FileAttenteNain = new File<Lettre> {};
-
-                    FileAttenteLutin = new File<Lettre>{};
 
                     EntrepotAsie = new Entrepot(Continents.Asie);
                     EntrepotAfrique = new Entrepot(Continents.Afrique);
@@ -1763,3 +1755,4 @@ namespace ProjectNoel
     }
 
 }
+
